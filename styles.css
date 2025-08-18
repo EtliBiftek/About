@@ -169,6 +169,13 @@ body {
 }
 .overlay-close:hover { filter: brightness(1.1); }
 
+/* Allow scrolling on phones only */
+@media (max-width: 768px) {
+  html, body {
+    overflow-y: auto; /* enable vertical scroll on mobile */
+  }
+}
+
 @media (max-width: 640px) {
   .brand { font-size: 48px; }
 }

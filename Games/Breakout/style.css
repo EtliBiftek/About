@@ -1,0 +1,86 @@
+/*
+	Minimal, responsive layout.
+	Uses a fixed internal canvas size (480x640) while scaling visually.
+*/
+
+:root {
+	--bg-top: #0f1020;
+	--bg-bottom: #05060d;
+	--panel: #1b1e2b;
+	--text: #e8eaf6;
+	--accent: #80d8ff;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+	margin: 0;
+	padding: 0;
+	background: linear-gradient(180deg, var(--bg-top), var(--bg-bottom));
+	color: var(--text);
+	font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+	min-height: 100%;
+}
+
+.page {
+	max-width: 900px;
+	margin: 0 auto;
+	padding: 16px;
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.title {
+	margin: 8px 0 4px;
+	font-weight: 700;
+	letter-spacing: 0.5px;
+	text-align: center;
+}
+
+.game {
+	background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+	border: 1px solid rgba(255,255,255,0.08);
+	border-radius: 8px;
+	padding: 12px;
+	display: grid;
+	justify-items: center;
+	gap: 10px;
+}
+
+/*
+	Canvas scales responsively while preserving aspect ratio.
+*/
+#game {
+	width: min(90vw, 540px);
+	height: auto;
+	max-height: 90vh;
+	background: radial-gradient(120% 120% at 50% 0%, rgba(128,216,255,0.06) 0%, rgba(0,0,0,0) 60%),
+		linear-gradient(180deg, #0a0b16 0%, #080914 100%);
+	border-radius: 8px;
+	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35), inset 0 0 0 1px rgba(255,255,255,0.05);
+}
+
+.controls {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	flex-wrap: wrap;
+}
+
+button#restartBtn {
+	background: var(--panel);
+	color: var(--text);
+	border: 1px solid rgba(255,255,255,0.1);
+	border-radius: 6px;
+	padding: 8px 12px;
+	cursor: pointer;
+	transition: transform 0.08s ease, background 0.2s ease;
+}
+
+button#restartBtn:hover {
+	background: #24283a;
+	transform: translateY(-1px);
+}
+
+.hint { opacity: 0.8; font-size: 0.9rem; }

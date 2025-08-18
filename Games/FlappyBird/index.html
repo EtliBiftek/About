@@ -1,0 +1,77 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+	<title>Flappy Bird</title>
+	<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+	<main class="shell" aria-label="Flappy Bird Oyun Kabığı">
+		<div class="stage" aria-live="polite">
+			<canvas id="game" width="400" height="600" role="img" aria-label="Flappy Bird Tuvali"></canvas>
+
+			<!-- HUD (skor kanvasta çiziliyor; ekran okuyucu için görünmez metin) -->
+			<div id="hud" class="sr-only">
+				<span id="scoreText" aria-live="polite">0</span>
+			</div>
+
+			<!-- Başlangıç Menüsü -->
+			<section id="menu" class="overlay visible" aria-label="Ana Menü">
+				<h1 class="title">Flappy Bird</h1>
+				<p class="subtitle">Zıplamak için Boşluk / Tıkla / Dokun</p>
+				<p class="subtitle">En iyi: <span id="bestMenu">0</span></p>
+				<div class="overlay-actions">
+					<button id="playBtn" class="btn primary" aria-label="Oyna">Oyna</button>
+				</div>
+				<div class="help">
+					<p>Kontroller: Boşluk / Yukarı Ok, Tıkla/Dokun. P = Duraklat, R = Yeniden Başlat</p>
+				</div>
+			</section>
+
+			<!-- Oyun Bitti Ekranı -->
+			<section id="gameover" class="overlay" aria-label="Oyun Bitti">
+				<h2 class="title">Oyun Bitti</h2>
+				<p class="subtitle">Skor: <span id="scoreOver">0</span></p>
+				<p class="subtitle">En iyi: <span id="bestOver">0</span></p>
+				<div class="overlay-actions">
+					<button id="restartBtn" class="btn primary" aria-label="Yeniden Başlat">Yeniden Başlat</button>
+				</div>
+			</section>
+		</div>
+
+		<!-- Ekran Üstü Kontroller (mobil uyumlu) -->
+		<section class="controls" aria-label="Kontroller">
+			<button id="mobilePlayBtn" class="btn primary" aria-label="Oyna">Oyna</button>
+			<button id="mobileRestartBtn" class="btn" aria-label="Yeniden Başlat">Yeniden Başlat</button>
+			<button id="muteBtn" class="btn" aria-pressed="false" aria-label="Sessize Al">Sessize Al</button>
+		</section>
+
+		<!-- Ayarlar -->
+		<section class="settings" aria-label="Ayarlar">
+			<label class="check">
+				<input type="checkbox" id="easyToggle" />
+				<span>Kolay mod</span>
+			</label>
+			<label class="check">
+				<input type="checkbox" id="aiToggle" />
+				<span>Yapay Zeka</span>
+			</label>
+			<label class="check">
+				<input type="checkbox" id="debugToggle" />
+				<span>Hata Ayıklama</span>
+			</label>
+			<label class="slider">
+				<span>Ses</span>
+				<input type="range" id="volume" min="0" max="1" step="0.01" value="0.8" />
+			</label>
+		</section>
+
+		<footer class="meta">
+		</footer>
+	</main>
+
+	<script src="script.js"></script>
+</body>
+</html>

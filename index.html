@@ -1,128 +1,53 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="tr">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>PIFO</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&family=Plus+Jakarta+Sans:ital,wght@0,400;0,600;0,800;1,700&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="./styles.css" />
+    <title>Game Select</title>
+    <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
+
+
     <main class="page">
       <section class="hero">
-        <h1 class="brand">PIFO</h1>
-        <p class="subtitle">
-          Playing <span class="highlight">Counter Strike 2</span> for my self.
-        </p>
-        <p class="subtitle">
-          Who knows, maybe I'll play for <span class="highlight">Eternal Fire</span> sometime.
-        </p>
-      </section>
-
-      <section class="contact">
-        <h2>Contact</h2>
-        <p class="email">
-          E-Mail: <a href="mailto:official.pifo@gmail.com" class="highlight">official.pifo@gmail.com</a>
-        </p>
       </section>
 
       <section class="links">
         <ul class="link-list">
           <li>
-            <a class="btn" href="https://x.com/PIFOcsgo" target="_blank" rel="noopener noreferrer">
-              <span>Twitter</span><span class="arrow">›</span>
+            <a class="btn" href="https://etlibiftek.github.io/Breakout/" target="_blank" rel="noopener noreferrer">
+              <span>Breakout</span><span class="arrow">›</span>
             </a>
           </li>
           <li>
-            <a class="btn" href="https://www.youtube.com/@etlibiftek" target="_blank" rel="noopener noreferrer">
-              <span>YouTube</span><span class="arrow">›</span>
+            <a class="btn" href="https://etlibiftek.github.io/Flappy-Bird/" target="_blank" rel="noopener noreferrer">
+              <span>Flappy Bird</span><span class="arrow">›</span>
             </a>
           </li>
           <li>
-            <a class="btn" href="https://www.twitch.tv/etlibiftek" target="_blank" rel="noopener noreferrer">
-              <span>Twitch</span><span class="arrow">›</span>
+             <a class="btn" href="https://etlibiftek.github.io/Reaction-Time-Test/" target="_blank" rel="noopener noreferrer">
+              <span>Reaction Time Test</span><span class="arrow">›</span>
             </a>
           </li>
           <li>
-            <a class="btn" href="https://steamcommunity.com/id/etlibiftek/" target="_blank" rel="noopener noreferrer">
+            <!-- <a class="btn" href="https://steamcommunity.com/id/etlibiftek/" target="_blank" rel="noopener noreferrer">
               <span>Steam</span><span class="arrow">›</span>
-            </a>
+            </a> -->
           </li>
           <li>
-            <a class="btn embed-link" href="#" data-src="CounterStrike Settings/index.html" data-mode="overlay">
+            <!-- <a class="btn" href="https://etlibiftek.github.io/Pifo-s-Counter-Strike-2-Settings/" target="_blank" rel="noopener noreferrer">
               <span>Counter Strike 2 Settings</span><span class="arrow">›</span>
-            </a>
+            </a> -->
           </li>
           <li>
-            <a class="btn embed-link" href="#" data-src="MyPc/index.html" data-mode="overlay">
+            <!-- <a class="btn" href="https://etlibiftek.github.io/Pifo-s-Computer-Parts/" target="_blank" rel="noopener noreferrer">
               <span>My Computer Parts</span><span class="arrow">›</span>
-            </a>
-          </li>
-          <li>
-            <a class="btn embed-link" href="#" data-src="GameSelect/index.html" data-mode="overlay">
-              <span>Game Select (Did it outta boredom.)</span><span class="arrow">›</span>
-            </a>
+            </a> -->
           </li>
         </ul>
       </section>
-
-      
-
-      <!-- Full-screen-ish overlay for special embeds (with 20px margins) -->
-      <div id="overlay-embed" class="overlay-embed" aria-hidden="true">
-        <iframe id="overlay-frame" title="Overlay content" loading="lazy"></iframe>
-        <button id="overlay-close" class="overlay-close" aria-label="Close">✕</button>
-      </div>
     </main>
-    <script>
-      (function() {
-        var links = document.querySelectorAll('.embed-link');
-        var frame = null;
-        var embedSection = null;
-        var overlay = document.getElementById('overlay-embed');
-        var overlayFrame = document.getElementById('overlay-frame');
-        var overlayClose = document.getElementById('overlay-close');
-        function toSafePath(path) {
-          // Encode only spaces to keep relative path readable
-          return path.replace(/\s/g, '%20');
-        }
-        function openOverlay(src) {
-          if (!overlay || !overlayFrame) return;
-          overlayFrame.setAttribute('src', toSafePath(src));
-          overlay.setAttribute('aria-hidden', 'false');
-          overlay.classList.add('is-open');
-        }
-        function closeOverlay() {
-          if (!overlay || !overlayFrame) return;
-          overlay.classList.remove('is-open');
-          overlay.setAttribute('aria-hidden', 'true');
-          overlayFrame.setAttribute('src', '');
-        }
-        if (overlayClose) {
-          overlayClose.addEventListener('click', closeOverlay);
-        }
-        document.addEventListener('keydown', function(ev) {
-          if (ev.key === 'Escape') closeOverlay();
-        });
-        links.forEach(function(link) {
-          link.addEventListener('click', function(ev) {
-            ev.preventDefault();
-            var src = link.getAttribute('data-src');
-            var mode = link.getAttribute('data-mode');
-            var size = link.getAttribute('data-size');
-            if (mode === 'overlay' && src) {
-              // Open special content in overlay
-              openOverlay(src);
-            } else {
-              // Fallback (no inline embed anymore) → open overlay
-              if (src) openOverlay(src);
-            }
-          });
-        });
-      })();
-    </script>
   </body>
   </html>
 

@@ -1,12 +1,12 @@
 /* Theme */
 :root {
-  --bg: #0b0b0c;
-  --panel: #141416;
-  --panel-2: #1b1b1e;
-  --border: #2b2b30;
-  --text: #e6e7eb;
-  --muted: #a6a7ad;
-  --red: #e11d48; /* accent */
+  --bg: #0b0e14;
+  --panel: #131823;
+  --panel-2: #192033;
+  --border: #273246;
+  --text: #e9edf4;
+  --muted: #a9b3c7;
+  --red: #ff5a8a; /* soft rose accent */
   --white: #ffffff;
 }
 
@@ -36,7 +36,7 @@ body {
   position: sticky;
   top: 0;
   z-index: 10;
-  background: linear-gradient(180deg, #111113, #0e0e10);
+  background: linear-gradient(180deg, #0f1521, #0b1018);
   border-bottom: 1px solid var(--border);
 }
 
@@ -155,11 +155,31 @@ body {
   border-radius: 8px;
   padding: 6px 10px;
   cursor: pointer;
+  transition: border-color 160ms ease, color 160ms ease, transform 140ms ease, box-shadow 160ms ease;
 }
 
 .copy-btn:hover {
   border-color: var(--red);
   color: var(--red);
+}
+
+.copy-btn:active { transform: translateY(1px); }
+.copy-btn:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(255,90,138,.25); border-color: var(--red); }
+
+/* Card entrance */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.sidebar .card, .main .card { opacity: 0; transform: translateY(6px); animation: fadeUp .38s ease forwards; }
+.sidebar .card:nth-child(1) { animation-delay: 60ms; }
+.sidebar .card:nth-child(2) { animation-delay: 110ms; }
+.sidebar .card:nth-child(3) { animation-delay: 160ms; }
+.sidebar .card:nth-child(4) { animation-delay: 210ms; }
+.sidebar .card:nth-child(5) { animation-delay: 260ms; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
 
 .card--code pre,

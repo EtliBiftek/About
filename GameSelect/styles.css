@@ -1,11 +1,11 @@
 :root {
-  --bg-0: #0b0c10;
-  --bg-1: #101218;
-  --text: #e6e6e6;
-  --muted: #a7a7a7;
-  --border: #2a2030;
-  --glow: rgba(255, 0, 64, 0.25);
-  --accent: #ff2b3d; /* red highlight instead of orange */
+  --bg-0: #0b0e14;
+  --bg-1: #101521;
+  --text: #e9edf4;
+  --muted: #a9b3c7;
+  --border: #273246;
+  --glow: rgba(255, 90, 138, 0.22);
+  --accent: #ff5a8a;
 }
 
 * {
@@ -16,8 +16,8 @@ html, body { height: 100%; }
 
 body {
   margin: 0;
-  background: radial-gradient(1200px 800px at 10% -10%, #17181f 0%, var(--bg-0) 45%),
-              radial-gradient(900px 700px at 110% 10%, #1a0d11 0%, var(--bg-0) 55%),
+  background: radial-gradient(1200px 800px at 10% -10%, #141a26 0%, var(--bg-0) 45%),
+              radial-gradient(900px 700px at 110% 10%, #1b1523 0%, var(--bg-0) 55%),
               var(--bg-0);
   color: var(--text);
   font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
@@ -81,11 +81,11 @@ body {
   text-decoration: none;
   color: var(--text);
   background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.2));
-  border: 1px solid #251b22;
+  border: 1px solid var(--border);
   border-radius: 18px;
   padding: 18px 22px;
-  box-shadow: 0 0 0 2px rgba(255, 43, 61, 0.06), 0 10px 24px 0 rgba(0, 0, 0, 0.35), inset 0 0 0 1px #2e2330;
-  transition: box-shadow 220ms ease, transform 220ms ease, border-color 220ms ease;
+  box-shadow: 0 0 0 2px rgba(255, 90, 138, 0.06), 0 10px 24px 0 rgba(0, 0, 0, 0.35), inset 0 0 0 1px rgba(255,255,255,0.05);
+  transition: box-shadow 220ms ease, transform 220ms ease, border-color 220ms ease, background-color 220ms ease;
 }
 
 .btn::before {
@@ -101,8 +101,8 @@ body {
 
 .btn:hover {
   transform: translateY(-2px);
-  border-color: rgba(255, 43, 61, 0.45);
-  box-shadow: 0 0 0 2px rgba(255, 43, 61, 0.25), 0 16px 36px rgba(0,0,0,0.45), inset 0 0 0 1px rgba(255, 43, 61, 0.15);
+  border-color: rgba(255, 90, 138, 0.45);
+  box-shadow: 0 0 0 2px rgba(255, 90, 138, 0.25), 0 16px 36px rgba(0,0,0,0.45), inset 0 0 0 1px rgba(255, 90, 138, 0.15);
 }
 
 .btn:hover::before {
@@ -118,6 +118,30 @@ body {
 .btn:hover .arrow {
   transform: translateX(3px);
   color: var(--accent);
+}
+
+.btn:active { transform: translateY(0); }
+.btn:focus-visible {
+  outline: none;
+  border-color: rgba(255, 43, 61, 0.55);
+  box-shadow: 0 0 0 3px rgba(255, 43, 61, 0.35), 0 10px 24px rgba(0,0,0,0.35), inset 0 0 0 1px rgba(255, 43, 61, 0.2);
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.link-list li { opacity: 0; transform: translateY(6px); animation: fadeUp 420ms ease forwards; }
+.link-list li:nth-child(1) { animation-delay: 60ms; }
+.link-list li:nth-child(2) { animation-delay: 120ms; }
+.link-list li:nth-child(3) { animation-delay: 180ms; }
+.link-list li:nth-child(4) { animation-delay: 240ms; }
+.link-list li:nth-child(5) { animation-delay: 300ms; }
+.link-list li:nth-child(6) { animation-delay: 360ms; }
+.link-list li:nth-child(7) { animation-delay: 420ms; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
 }
 
 .contact {

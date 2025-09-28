@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<title>Reaction Time Test</title>
+	<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+	<main class="page">
+		<h1 class="title">Reaction Time Test</h1>
+
+		<section class="game">
+			<div id="screen" class="screen" role="button" tabindex="0" aria-live="polite" aria-label="Tepki zamanı alanı">
+				Başlamak için ekrana tıklayın.
+			</div>
+			<div class="controls">
+				<button id="startBtn" type="button" title="Oyunu başlat">Başla</button>
+				<p id="message" class="message">Beklemede</p>
+				<p class="best">En iyi: <span id="best">-</span> ms</p>
+			</div>
+		</section>
+	</main>
+
+	<script src="script.js"></script>
+</body>
+</html>
+
+

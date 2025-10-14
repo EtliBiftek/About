@@ -18,11 +18,12 @@ document.addEventListener("click", async (event) => {
 
   try {
     await navigator.clipboard.writeText(textToCopy.trim());
-    target.textContent = "Kopyalandı";
-    setTimeout(() => (target.textContent = "Kopyala"), 1200);
+    target.textContent = "Copied";
+    setTimeout(() => (target.textContent = "Copy"), 1200);
   } catch (err) {
     console.error("Kopyalama hatası", err);
   }
 });
+
 
 

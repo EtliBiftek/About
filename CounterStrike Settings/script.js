@@ -21,9 +21,8 @@ document.addEventListener("click", async (event) => {
     target.textContent = "Copied";
     setTimeout(() => (target.textContent = "Copy"), 1200);
   } catch (err) {
-    console.error("Kopyalama hatası", err);
+    console.error("Copy Error", err);
   }
 });
-
 
 

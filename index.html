@@ -1,129 +1,293 @@
 <!DOCTYPE html>
 <html lang="tr">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>PIFO</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&family=Plus+Jakarta+Sans:ital,wght@0,400;0,600;0,800;1,700&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="./styles.css" />
-  </head>
-  <body>
-    <main class="page">
-      <section class="hero">
-        <h1 class="brand">PIFO</h1>
-        <p class="subtitle">
-          Playing <span class="highlight">Counter Strike 2</span> for myself.
-        </p>
-        <p class="subtitle">
-          Who knows, maybe I'll play for <span class="highlight">Eternal Fire</span> sometime.
-        </p>
-      </section>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PIFO - Counter Strike 2 Player</title>
+    <link rel="stylesheet" href="theme.css">
+<style>
+:root {
+    --bg-dark: #121212;
+    --card-bg: #1e1e1e;
+    --text-primary: #ffffff;
+    --text-secondary: #b0b0b0;
+    --accent: #ff4444;
+    --accent-hover: #ff6666;
+    --border: #333333;
+    --hover-bg: #2d2d2d;
+    --loading-bg: #121212;
+}
 
-      <section class="contact">
-        <h2>Contact</h2>
-        <p class="email">
-          E-Mail: <a href="mailto:official.pifo@gmail.com" class="highlight">official.pifo@gmail.com</a>
-        </p>
-      </section>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:linear-gradient(135deg,var(--bg-dark) 0%,#1a1a1a 100%);color:var(--text-primary);line-height:1.6;min-height:100vh;padding:20px;visibility:hidden;}
+body.loaded{visibility:visible;}
+header{text-align:center;padding:20px;margin-bottom:30px;animation:fadeInDown 0.8s ease-out forwards;opacity:0;animation-delay: 0.3s;}
+.brand{font-size:2.5rem;margin-bottom:10px;background:linear-gradient(45deg,var(--text-primary),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.subtitle{color:var(--text-secondary);font-size:1.1rem;opacity:.8;margin:10px 0;}
+.contact-bar {
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 15px 25px;
+    border: 1px solid var(--border);
+    box-shadow: 0 8px 32px rgba(0,0,0,.3);
+    margin-top: 30px;
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: space-evenly; /* <- Burayı space-between yerine center yaptık */
+    align-items: space-around;
+    flex-wrap: wrap;
+    gap: 200px; /* biraz daha geniş boşluk */
+    opacity: 0;
+    animation: slideInUp 0.6s ease-out forwards;
+    animation-delay: 0.6s;
+}
 
-      <section class="links">
+.contact-item {
+    color: var(--text-secondary);
+    font-size: 1rem;
+    text-align: center; /* metinleri ortala */
+}
+
+.contact-item a{color:var(--accent);text-decoration:none;transition:color .3s ease;}
+.contact-item a:hover{color:var(--accent-hover);text-decoration:underline;}
+.container{display:grid;grid-template-columns:repeat(auto-fit,minmax(350px,1fr));gap:25px;max-width:1400px;margin:0 auto;opacity:0;animation:fadeIn 0.8s ease-out forwards;animation-delay: 0.9s;}
+.card{background:var(--card-bg);border-radius:16px;padding:25px;border:1px solid var(--border);box-shadow:0 8px 32px rgba(0,0,0,.3);transition:all .4s cubic-bezier(0.175,0.885,0.32,1.275);backdrop-filter:blur(10px);position:relative;overflow:hidden;opacity:0;}
+.card:nth-child(1){animation:slideInUp 0.6s ease-out forwards;animation-delay: 1.2s;}
+.card:nth-child(2){animation:slideInUp 0.6s ease-out forwards;animation-delay: 1.4s;}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent);transform:scaleX(0);transition:transform .6s ease;}
+.card:hover{transform:translateY(-8px) scale(1.02);box-shadow:0 15px 40px rgba(255,68,68,.2);border-color:var(--accent);}
+.card:hover::before{transform:scaleX(1);}
+.card-header{display:flex;align-items:center;margin-bottom:20px;padding-bottom:15px;border-bottom:1px solid var(--border);}
+.card-number{background:var(--accent);color:var(--bg-dark);width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:1.2rem;margin-right:15px;flex-shrink:0;}
+.card-title{font-size:1.4rem;font-weight:600;color:var(--text-primary);}
+.section-title{color:var(--accent);font-size:1.1rem;margin:20px 0 12px 0;font-weight:500;}
+ul{list-style:none;padding-left:0;}
+li{padding:8px 0 8px 25px;position:relative;color:var(--text-secondary);transition:color .3s ease;}
+li:hover{color:var(--text-primary);}
+li::before{content:'•';color:var(--accent);position:absolute;left:0;font-size:1.2rem;}
+.highlight{color:var(--accent);font-weight:600;}
+.btn{display:flex;align-items:center;justify-content:space-between;background:var(--hover-bg);color:var(--text-primary);text-decoration:none;padding:15px 20px;border-radius:12px;margin:8px 0;transition:all .3s ease;border:1px solid var(--border);}
+.btn:hover{background:var(--accent);color:var(--bg-dark);transform:translateX(5px);}
+.arrow{font-size:1.5rem;font-weight:bold;}
+.link-list{list-style:none;padding:0;}
+
+/* Loading Screen */
+.loading-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--loading-bg);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  opacity: 1;
+  transition: opacity 0s ease;
+}
+.loading-screen.hidden {
+  opacity: 0;
+  pointer-events: none;
+  display: none;
+}
+.spinner {
+  width: 60px;
+  height: 60px;
+  border: 4px solid rgba(255, 255, 255, 0.1);
+  border-top: 4px solid var(--accent);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+.loading-text {
+  color: var(--text-primary);
+  margin-top: 20px;
+  font-size: 1.2rem;
+  text-align: center;
+  opacity: 0.7;
+}
+
+/* Animations */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes slideInUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* Overlay styles */
+.overlay-embed {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  right: 20px;
+  bottom: 20px;
+  background: var(--card-bg);
+  border: 1px solid var(--accent);
+  border-radius: 16px;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+    display: none;
+  transform: scale(0.95);
+  transition: all 0.3s ease;
+}
+.overlay-embed.is-open { opacity: 1; visibility: visible; transform: scale(1); }
+.overlay-embed { /* ensure no inner padding forces extra space */
+    padding: 0;
+}
+#overlay-frame { 
+    width: 100%; 
+    height: 100%; /* fill full overlay to avoid bottom gap */
+    border: none; 
+    border-radius: 16px; /* match overlay rounding */
+    display: block;
+    background: transparent;
+}
+.overlay-close {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+    z-index: 1001;
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  font-size: 24px;
+  cursor: pointer;
+  padding: 5px 10px;
+  border-radius: 50%;
+  transition: background 0.3s ease;
+}
+.overlay-close:hover { background: rgba(255,255,255,0.1); }
+
+@media (max-width: 768px) {
+    .contact-bar { flex-direction: column; text-align: center; }
+    .card-number { width: 35px; height: 35px; font-size: 1rem; }
+    .card-title { font-size: 1.2rem; }
+}
+
+</style>
+</head>
+<body>
+
+<!-- Loading Screen -->
+<div class="loading-screen" id="loadingScreen">
+    <div style="text-align: center;">
+        <div class="spinner"></div>
+        <div class="loading-text"></div>
+    </div>
+</div>
+
+<header>
+    <h1 class="brand">PIFO</h1>
+    <p class="subtitle">Playing <span class="highlight">Counter Strike 2</span> for myself.</p>
+    <p class="subtitle">Who knows, maybe I'll play for <span class="highlight">Eternal Fire</span> sometime.</p>
+    
+    <div class="contact-bar">
+        <div class="contact-item">E-Mail: <a href="mailto:official.pifo@gmail.com">official.pifo@gmail.com</a></div>
+        <div class="contact-item">Twitter: <a href="https://x.com/PIFOcsgo" target="_blank">@PIFOcsgo</a>ㅤㅤㅤㅤㅤ</div>
+        <div class="contact-item">YouTube: <a href="https://www.youtube.com/@etlibiftek" target="_blank">@etlibiftek</a></div>
+    </div>
+</header>
+
+<div class="container">
+    <div class="card">
+        <div class="card-header">
+            <div class="card-number">1</div>
+            <div class="card-title">Social Links</div>
+        </div>
+        <div class="section-title">Follow Me:</div>
         <ul class="link-list">
-          <li>
-            <a class="btn" href="https://x.com/PIFOcsgo" target="_blank" rel="noopener noreferrer">
-              <span>Twitter</span><span class="arrow">›</span>
-            </a>
-          </li>
-          <li>
-            <a class="btn" href="https://www.youtube.com/@etlibiftek" target="_blank" rel="noopener noreferrer">
-              <span>YouTube</span><span class="arrow">›</span>
-            </a>
-          </li>
-          <li>
-            <a class="btn" href="https://www.twitch.tv/etlibiftek" target="_blank" rel="noopener noreferrer">
-              <span>Twitch</span><span class="arrow">›</span>
-            </a>
-          </li>
-          <li>
-            <a class="btn" href="https://github.com/EtliBiftek?tab=repositories" target="_blank" rel="noopener noreferrer">
-              <span>GitHub</span><span class="arrow">›</span>
-            </a>
-          </li>
-          <li>
-            <a class="btn embed-link" href="#" data-src="CounterStrike Settings/index.html" data-mode="overlay">
-              <span>Counter Strike 2 Settings</span><span class="arrow">›</span>
-            </a>
-          </li>
-          <li>
-            <a class="btn embed-link" href="#" data-src="MyPc/index.html" data-mode="overlay">
-              <span>My Computer Parts</span><span class="arrow">›</span>
-            </a>
-          </li>
-          <li>
-            <a class="btn embed-link" href="#" data-src="GameSelect/index.html" data-mode="overlay">
-              <span>Game Select (Did it outta boredom.)</span><span class="arrow">›</span>
-            </a>
-          </li>
+            <li><a class="btn" href="https://x.com/PIFOcsgo" target="_blank"><span>Twitter</span><span class="arrow">›</span></a></li>
+            <li><a class="btn" href="https://www.youtube.com/@etlibiftek" target="_blank"><span>YouTube</span><span class="arrow">›</span></a></li>
+            <li><a class="btn" href="https://www.twitch.tv/etlibiftek" target="_blank"><span>Twitch</span><span class="arrow">›</span></a></li>
+            <li><a class="btn" href="https://github.com/EtliBiftek?tab=repositories" target="_blank"><span>GitHub</span><span class="arrow">›</span></a></li>
         </ul>
-      </section>
+    </div>
 
-      
+    <div class="card">
+        <div class="card-header">
+            <div class="card-number">2</div>
+            <div class="card-title">Special Content</div>
+        </div>
+        <div class="section-title">Check These Out:</div>
+        <ul class="link-list">
+            <li><a class="btn embed-link" href="#" data-src="CounterStrike Settings/index.html" data-mode="overlay"><span>Counter Strike 2 Settings</span><span class="arrow">›</span></a></li>
+            <li><a class="btn embed-link" href="#" data-src="MyPc/index.html" data-mode="overlay"><span>My Computer Parts</span><span class="arrow">›</span></a></li>
+            <li><a class="btn embed-link" href="#" data-src="GameSelect/index.html" data-mode="overlay"><span>Game Select (Did it outta boredom.)</span><span class="arrow">›</span></a></li>
+        </ul>
+    </div>
+</div>
 
-      <!-- Full-screen-ish overlay for special embeds (with 20px margins) -->
-      <div id="overlay-embed" class="overlay-embed" aria-hidden="true">
-        <iframe id="overlay-frame" title="Overlay content" loading="lazy"></iframe>
-        <button id="overlay-close" class="overlay-close" aria-label="Close">✕</button>
-      </div>
-    </main>
-    <script>
-      (function() {
-        var links = document.querySelectorAll('.embed-link');
-        var frame = null;
-        var embedSection = null;
-        var overlay = document.getElementById('overlay-embed');
-        var overlayFrame = document.getElementById('overlay-frame');
-        var overlayClose = document.getElementById('overlay-close');
-        function toSafePath(path) {
-          // Encode only spaces to keep relative path readable
-          return path.replace(/\s/g, '%20');
-        }
-        function openOverlay(src) {
-          if (!overlay || !overlayFrame) return;
-          overlayFrame.setAttribute('src', toSafePath(src));
-          overlay.setAttribute('aria-hidden', 'false');
-          overlay.classList.add('is-open');
-        }
-        function closeOverlay() {
-          if (!overlay || !overlayFrame) return;
-          overlay.classList.remove('is-open');
-          overlay.setAttribute('aria-hidden', 'true');
-          overlayFrame.setAttribute('src', '');
-        }
-        if (overlayClose) {
-          overlayClose.addEventListener('click', closeOverlay);
-        }
-        document.addEventListener('keydown', function(ev) {
-          if (ev.key === 'Escape') closeOverlay();
+<!-- Overlay -->
+<div id="overlay-embed" class="overlay-embed" aria-hidden="true">
+    <iframe id="overlay-frame" title="Overlay content" loading="lazy"></iframe>
+    <button id="overlay-close" class="overlay-close" aria-label="Close">✕</button>
+</div>
+
+<script>
+// Loading Screen
+window.addEventListener('load', function() {
+    const loadingScreen = document.getElementById('loadingScreen');
+    loadingScreen.style.opacity = '0';
+    loadingScreen.style.transition = 'opacity 0.5s ease';
+    setTimeout(function() {
+        loadingScreen.style.display = 'none';
+        document.body.classList.add('loaded');
+    }, 500);
+});
+
+// Overlay functionality
+(function() {
+    var links = document.querySelectorAll('.embed-link');
+    var overlay = document.getElementById('overlay-embed');
+    var overlayFrame = document.getElementById('overlay-frame');
+    var overlayClose = document.getElementById('overlay-close');
+    
+    function toSafePath(path) { return path.replace(/\s/g, '%20'); }
+    
+    function openOverlay(src) {
+        if (!overlay || !overlayFrame) return;
+        // Ensure the overlay is displayed before starting the transition
+        overlay.style.display = 'block';
+        // Give the browser one frame to apply display change so transition runs smoothly
+        requestAnimationFrame(function() {
+            overlayFrame.setAttribute('src', toSafePath(src));
+            overlay.setAttribute('aria-hidden', 'false');
+            overlay.classList.add('is-open');
         });
-        links.forEach(function(link) {
-          link.addEventListener('click', function(ev) {
+    }
+function closeOverlay() {
+    if (!overlay || !overlayFrame) return;
+    overlay.classList.remove('is-open');
+    overlay.setAttribute('aria-hidden', 'true');
+    // Animasyon bitiminden sonra tamamen gizle ve iframe kaynağını temizle
+    setTimeout(() => {
+        overlay.style.display = 'none';
+        overlayFrame.setAttribute('src', '');
+    }, 300); // CSS geçiş süresine eşit
+}
+
+    
+    if (overlayClose) overlayClose.addEventListener('click', closeOverlay);
+    document.addEventListener('keydown', function(ev) { if (ev.key === 'Escape') closeOverlay(); });
+    links.forEach(function(link) {
+        link.addEventListener('click', function(ev) {
             ev.preventDefault();
             var src = link.getAttribute('data-src');
             var mode = link.getAttribute('data-mode');
-            var size = link.getAttribute('data-size');
-            if (mode === 'overlay' && src) {
-              // Open special content in overlay
-              openOverlay(src);
-            } else {
-              // Fallback (no inline embed anymore) → open overlay
-              if (src) openOverlay(src);
-            }
-          });
+            if (mode === 'overlay' && src) openOverlay(src);
         });
-      })();
-    </script>
-  </body>
-  </html>
+    });
+})();
+</script>
 
-
+</body>
+</html>

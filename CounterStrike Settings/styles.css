@@ -1,14 +1,37 @@
 /* Theme */
 :root {
-  --bg: #0b0e14;
-  --panel: #131823;
-  --panel-2: #192033;
-  --border: #273246;
+  --bg: #121212;
+  --panel: #1f1e1e;
+  --panel-2: #333333;
+  --border: #333333;
   --text: #e9edf4;
   --muted: #a9b3c7;
-  --red: #ff5a8a; /* soft rose accent */
+  --red: #ff4444; /* soft rose accent */
   --white: #ffffff;
 }
+/* Scroll bar genel görünümü */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+/* Scroll bar arka planı */
+::-webkit-scrollbar-track {
+  background: #1a1a1a;
+  border-radius: 10px;
+}
+
+/* Scroll bar rengi */
+::-webkit-scrollbar-thumb {
+  background: #ff4444; /* Mor renk */
+  border-radius: 10px;
+}
+
+/* Hover durumunda daha açık mor */
+::-webkit-scrollbar-thumb:hover {
+  background: #ff4444;
+}
+
 
 * {
   box-sizing: border-box;

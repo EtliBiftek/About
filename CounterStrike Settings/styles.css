@@ -9,25 +9,21 @@
   --red: #ff4444; /* soft rose accent */
   --white: #ffffff;
 }
-/* Scroll bar genel görünümü */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
-/* Scroll bar arka planı */
 ::-webkit-scrollbar-track {
   background: #1a1a1a;
   border-radius: 10px;
 }
 
-/* Scroll bar rengi */
 ::-webkit-scrollbar-thumb {
-  background: #ff4444; /* Mor renk */
+  background: #ff4444;
   border-radius: 10px;
 }
 
-/* Hover durumunda daha açık mor */
 ::-webkit-scrollbar-thumb:hover {
   background: #ff4444;
 }

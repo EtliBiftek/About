@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Köstebek Vur</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            text-decoration: none;
+            border-radius: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateX(-5px);
+        }
+
+        .lang-switcher {
+            position: fixed;
+            top: 70px;
+            right: 20px;
+            display: flex;
+            gap: 5px;
+            z-index: 1000;
+        }
+
+        .lang-btn {
+            padding: 8px 15px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #888;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .lang-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            color: #fff;
+        }
+
+        .lang-btn.active {
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #252525 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+        }
+
+        .game-container {
+            text-align: center;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        h1 {
+            color: #ffffff;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+        }
+
+        .info-bar {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 25px;
+        }
+
+        .info-item {
+            text-align: center;
+        }
+
+        .info-label {
+            color: #666;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            color: #fff;
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+
+        #gameBoard {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            border: 3px solid #666;
+            margin-bottom: 25px;
+        }
+
+        .hole {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(180deg, #1a1a1a 0%, #0a0a0a 100%);
+            border-radius: 50%;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            border: 3px solid #333;
+            box-shadow: inset 0 10px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .mole {
+            position: absolute;
+            bottom: -80px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(180deg, #666 0%, #444 100%);
+            border-radius: 50% 50% 45% 45%;
+            transition: bottom 0.15s ease-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .mole.up {
+            bottom: 15px;
+        }
+
+        .mole.hit {
+            background: linear-gradient(180deg, #888 0%, #666 100%);
+        }
+
+        .mole-eyes {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .eye {
+            width: 12px;
+            height: 12px;
+            background: #1a1a1a;
+            border-radius: 50%;
+            position: relative;
+        }
+
+        .eye::after {
+            content: '';
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #fff;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+        }
+
+        .mole.hit .eye {
+            height: 3px;
+            border-radius: 0;
+        }
+
+        .mole.hit .eye::after {
+            display: none;
+        }
+
+        .mole-nose {
+            width: 15px;
+            height: 10px;
+            background: #333;
+            border-radius: 50%;
+            margin-top: 5px;
+        }
+
+        .start-btn,
+        .new-game-btn {
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 50px;
+            background: linear-gradient(145deg, #ffffff, #cccccc);
+            color: #1a1a1a;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 20px rgba(255, 255, 255, 0.2);
+        }
+
+        .start-btn:hover,
+        .new-game-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 255, 255, 0.3);
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+
+        .overlay.hidden {
+            display: none;
+        }
+
+        .overlay-content {
+            text-align: center;
+            color: #fff;
+            animation: popIn 0.3s ease;
+        }
+
+        @keyframes popIn {
+            from {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .overlay-content h2 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+        }
+
+        .overlay-content p {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            color: #aaa;
+        }
+
+        .overlay-content .final-score {
+            font-size: 4rem;
+            color: #fff;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .difficulty-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            justify-content: center;
+        }
+
+        .diff-btn {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 25px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #aaa;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .diff-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            color: #fff;
+        }
+
+        .diff-btn.active {
+            background: linear-gradient(145deg, #ffffff, #cccccc);
+            color: #1a1a1a;
+            font-weight: bold;
+        }
+
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: -1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            animation: float 15s infinite;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 1;
+            }
+
+            90% {
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(-100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        .hit-effect {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #fff;
+            pointer-events: none;
+            animation: hitFloat 0.5s ease-out forwards;
+        }
+
+        @keyframes hitFloat {
+            0% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+
+            100% {
+                opacity: 0;
+                transform: translate(-50%, -100%) scale(1.5);
+            }
+        }
+
+        @media (max-width: 400px) {
+            .game-container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .hole {
+                width: 80px;
+                height: 80px;
+            }
+
+            .mole {
+                width: 55px;
+                height: 55px;
+            }
+
+            #gameBoard {
+                gap: 10px;
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <a href="../index.html" class="back-btn" id="backBtn">← Back</a>
+
+    <div class="lang-switcher">
+        <button class="lang-btn" id="langEN" onclick="setLanguage('en')">EN</button>
+        <button class="lang-btn active" id="langTR" onclick="setLanguage('tr')">TR</button>
+    </div>
+
+    <div class="particles" id="particles"></div>
+
+    <div class="overlay" id="startOverlay">
+        <div class="overlay-content">
+            <h2 id="startTitle">Köstebek Vur</h2>
+            <p id="startDesc">Köstebekleri olabildiğince hızlı vur!</p>
+            <p style="margin-bottom: 30px; font-size: 1rem;" id="startTime">30 saniye süren var</p>
+            <button class="start-btn" onclick="startGame()" id="startBtn">Başla</button>
+        </div>
+    </div>
+
+    <div class="overlay hidden" id="endOverlay">
+        <div class="overlay-content">
+            <h2 id="endTitle">Süre Doldu!</h2>
+            <p id="yourScore">Skorun</p>
+            <div class="final-score" id="finalScore">0</div>
+            <p id="accuracy"></p>
+            <button class="new-game-btn" onclick="startGame()" style="margin-top: 20px;" id="playAgainBtn">Tekrar
+                Oyna</button>
+        </div>
+    </div>
+
+    <div class="game-container">
+        <h1 id="gameTitle">Köstebek Vur</h1>
+
+        <div class="difficulty-selector">
+            <button class="diff-btn" onclick="setDifficulty('easy')" id="easyBtn">Kolay</button>
+            <button class="diff-btn active" onclick="setDifficulty('medium')" id="mediumBtn">Orta</button>
+            <button class="diff-btn" onclick="setDifficulty('hard')" id="hardBtn">Zor</button>
+        </div>
+
+        <div class="info-bar">
+            <div class="info-item">
+                <div class="info-label" id="scoreLabel">Skor</div>
+                <div class="info-value" id="score">0</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label" id="timeLabel">Süre</div>
+                <div class="info-value" id="timer">30</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label" id="highLabel">En Yüksek</div>
+                <div class="info-value" id="highScore">0</div>
+            </div>
+        </div>
+
+        <div id="gameBoard"></div>
+
+        <button class="new-game-btn" onclick="startGame()" id="newGameBtn">Yeni Oyun</button>
+    </div>
+
+    <script>
+        // Dil sistemi
+        const translations = {
+            tr: {
+                back: '← Geri',
+                startTitle: 'Köstebek Vur',
+                startDesc: 'Köstebekleri olabildiğince hızlı vur!',
+                startTime: '30 saniye süren var',
+                startBtn: 'Başla',
+                endTitle: 'Süre Doldu!',
+                yourScore: 'Skorun',
+                playAgainBtn: 'Tekrar Oyna',
+                gameTitle: 'Köstebek Vur',
+                easyBtn: 'Kolay',
+                mediumBtn: 'Orta',
+                hardBtn: 'Zor',
+                scoreLabel: 'Skor',
+                timeLabel: 'Süre',
+                highLabel: 'En Yüksek',
+                newGameBtn: 'Yeni Oyun',
+                accuracy: 'İsabet: {0}% ({1}/{2})'
+            },
+            en: {
+                back: '← Back',
+                startTitle: 'Whack-a-Mole',
+                startDesc: 'Whack the moles as fast as you can!',
+                startTime: 'You have 30 seconds',
+                startBtn: 'Start',
+                endTitle: 'Time\'s Up!',
+                yourScore: 'Your Score',
+                playAgainBtn: 'Play Again',
+                gameTitle: 'Whack-a-Mole',
+                easyBtn: 'Easy',
+                mediumBtn: 'Medium',
+                hardBtn: 'Hard',
+                scoreLabel: 'Score',
+                timeLabel: 'Time',
+                highLabel: 'High Score',
+                newGameBtn: 'New Game',
+                accuracy: 'Accuracy: {0}% ({1}/{2})'
+            }
+        };
+
+        let currentLang = localStorage.getItem('siteLang') || 'en';
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem('siteLang', lang);
+
+            document.getElementById('langTR').classList.toggle('active', lang === 'tr');
+            document.getElementById('langEN').classList.toggle('active', lang === 'en');
+
+            const t = translations[lang];
+            document.getElementById('backBtn').textContent = t.back;
+            document.getElementById('startTitle').textContent = t.startTitle;
+            document.getElementById('startDesc').textContent = t.startDesc;
+            document.getElementById('startTime').textContent = t.startTime;
+            document.getElementById('startBtn').textContent = t.startBtn;
+            document.getElementById('endTitle').textContent = t.endTitle;
+            document.getElementById('yourScore').textContent = t.yourScore;
+            document.getElementById('playAgainBtn').textContent = t.playAgainBtn;
+            document.getElementById('gameTitle').textContent = t.gameTitle;
+            document.getElementById('easyBtn').textContent = t.easyBtn;
+            document.getElementById('mediumBtn').textContent = t.mediumBtn;
+            document.getElementById('hardBtn').textContent = t.hardBtn;
+            document.getElementById('scoreLabel').textContent = t.scoreLabel;
+            document.getElementById('timeLabel').textContent = t.timeLabel;
+            document.getElementById('highLabel').textContent = t.highLabel;
+            document.getElementById('newGameBtn').textContent = t.newGameBtn;
+        }
+
+        setLanguage(currentLang);
+        const difficulties = {
+            easy: { moleUpTime: 1500, spawnInterval: 1200 },
+            medium: { moleUpTime: 1000, spawnInterval: 900 },
+            hard: { moleUpTime: 600, spawnInterval: 600 }
+        };
+
+        let currentDifficulty = 'medium';
+        let score = 0;
+        let timeLeft = 30;
+        let highScore = localStorage.getItem('moleHighScore') || 0;
+        let gameInterval = null;
+        let timerInterval = null;
+        let moleTimeouts = [];
+        let isPlaying = false;
+        let totalMoles = 0;
+        let hitMoles = 0;
+
+        // Parçacık efektleri
+        function createParticles() {
+            const container = document.getElementById('particles');
+            for (let i = 0; i < 30; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 15 + 's';
+                particle.style.animationDuration = (15 + Math.random() * 10) + 's';
+                container.appendChild(particle);
+            }
+        }
+        createParticles();
+
+        document.getElementById('highScore').textContent = highScore;
+
+        function createBoard() {
+            const board = document.getElementById('gameBoard');
+            board.innerHTML = '';
+
+            for (let i = 0; i < 9; i++) {
+                const hole = document.createElement('div');
+                hole.className = 'hole';
+                hole.dataset.index = i;
+
+                const mole = document.createElement('div');
+                mole.className = 'mole';
+                mole.innerHTML = `
+                    <div class="mole-eyes">
+                        <div class="eye"></div>
+                        <div class="eye"></div>
+                    </div>
+                    <div class="mole-nose"></div>
+                `;
+
+                hole.appendChild(mole);
+                hole.addEventListener('click', () => whack(i));
+                board.appendChild(hole);
+            }
+        }
+
+        function setDifficulty(diff) {
+            currentDifficulty = diff;
+            document.querySelectorAll('.diff-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        function startGame() {
+            document.getElementById('startOverlay').classList.add('hidden');
+            document.getElementById('endOverlay').classList.add('hidden');
+
+            score = 0;
+            timeLeft = 30;
+            totalMoles = 0;
+            hitMoles = 0;
+            isPlaying = true;
+
+            document.getElementById('score').textContent = '0';
+            document.getElementById('timer').textContent = '30';
+
+            createBoard();
+
+            // Önceki interval'leri temizle
+            clearInterval(gameInterval);
+            clearInterval(timerInterval);
+            moleTimeouts.forEach(t => clearTimeout(t));
+            moleTimeouts = [];
+
+            // Oyun döngüsü
+            const { spawnInterval } = difficulties[currentDifficulty];
+            gameInterval = setInterval(spawnMole, spawnInterval);
+            spawnMole();
+
+            // Zamanlayıcı
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                document.getElementById('timer').textContent = timeLeft;
+
+                if (timeLeft <= 0) {
+                    endGame();
+                }
+            }, 1000);
+        }
+
+        function spawnMole() {
+            if (!isPlaying) return;
+
+            const holes = document.querySelectorAll('.hole');
+            const availableHoles = Array.from(holes).filter(
+                hole => !hole.querySelector('.mole.up')
+            );
+
+            if (availableHoles.length === 0) return;
+
+            const randomHole = availableHoles[Math.floor(Math.random() * availableHoles.length)];
+            const mole = randomHole.querySelector('.mole');
+
+            mole.classList.add('up');
+            mole.classList.remove('hit');
+            totalMoles++;
+
+            const { moleUpTime } = difficulties[currentDifficulty];
+            const timeout = setTimeout(() => {
+                mole.classList.remove('up');
+            }, moleUpTime);
+            moleTimeouts.push(timeout);
+        }
+
+        function whack(index) {
+            if (!isPlaying) return;
+
+            const hole = document.querySelectorAll('.hole')[index];
+            const mole = hole.querySelector('.mole');
+
+            if (mole.classList.contains('up') && !mole.classList.contains('hit')) {
+                mole.classList.add('hit');
+                score += 10;
+                hitMoles++;
+                document.getElementById('score').textContent = score;
+
+                // Hit efekti
+                const hitEffect = document.createElement('div');
+                hitEffect.className = 'hit-effect';
+                hitEffect.textContent = '+10';
+                hole.appendChild(hitEffect);
+                setTimeout(() => hitEffect.remove(), 500);
+
+                // Köstebeği aşağı indir
+                setTimeout(() => {
+                    mole.classList.remove('up');
+                }, 200);
+            }
+        }
+
+        function endGame() {
+            isPlaying = false;
+            clearInterval(gameInterval);
+            clearInterval(timerInterval);
+            moleTimeouts.forEach(t => clearTimeout(t));
+
+            // Tüm köstebekleri indir
+            document.querySelectorAll('.mole').forEach(mole => {
+                mole.classList.remove('up');
+            });
+
+            // High score güncelle
+            if (score > highScore) {
+                highScore = score;
+                localStorage.setItem('moleHighScore', highScore);
+                document.getElementById('highScore').textContent = highScore;
+            }
+
+            // Sonuç ekranı
+            document.getElementById('finalScore').textContent = score;
+            const accuracy = totalMoles > 0 ? Math.round((hitMoles / totalMoles) * 100) : 0;
+            document.getElementById('accuracy').textContent = `İsabet: ${accuracy}% (${hitMoles}/${totalMoles})`;
+            document.getElementById('endOverlay').classList.remove('hidden');
+        }
+
+        // Tahtayı oluştur
+        createBoard();
+    </script>
+</body>
+
+</html>

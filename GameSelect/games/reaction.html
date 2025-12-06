@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tepki Süresi Testi</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            text-decoration: none;
+            border-radius: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateX(-5px);
+        }
+
+        .lang-switcher {
+            position: fixed;
+            top: 70px;
+            right: 20px;
+            display: flex;
+            gap: 5px;
+            z-index: 1000;
+        }
+
+        .lang-btn {
+            padding: 8px 15px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #888;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .lang-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            color: #fff;
+        }
+
+        .lang-btn.active {
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #252525 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+        }
+
+        .game-container {
+            text-align: center;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            max-width: 500px;
+            width: 90%;
+        }
+
+        h1 {
+            color: #ffffff;
+            font-size: 2rem;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 0.95rem;
+        }
+
+        #testArea {
+            width: 100%;
+            height: 300px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 25px;
+            border: 3px solid #666;
+            user-select: none;
+        }
+
+        #testArea.waiting {
+            background: linear-gradient(145deg, #1a1a1a, #252525);
+        }
+
+        #testArea.ready {
+            background: linear-gradient(145deg, #2a2a2a, #3a3a3a);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+            }
+
+            50% {
+                box-shadow: 0 0 40px rgba(255, 255, 255, 0.2);
+            }
+        }
+
+        #testArea.go {
+            background: linear-gradient(145deg, #ffffff, #dddddd);
+            border-color: #fff;
+            box-shadow: 0 0 50px rgba(255, 255, 255, 0.5);
+        }
+
+        #testArea.go .test-text {
+            color: #1a1a1a;
+        }
+
+        #testArea.too-early {
+            background: linear-gradient(145deg, #333, #444);
+        }
+
+        #testArea.result {
+            background: linear-gradient(145deg, #2a2a2a, #3a3a3a);
+        }
+
+        .test-text {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #fff;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .test-text .time {
+            font-size: 4rem;
+            display: block;
+            margin: 10px 0;
+            text-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
+        }
+
+        .test-text .unit {
+            font-size: 1.2rem;
+            color: #888;
+        }
+
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .stat-box {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            color: #fff;
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+
+        .attempts-list {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            max-height: 150px;
+            overflow-y: auto;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .attempts-title {
+            color: #666;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .attempt {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+
+        .attempt:last-child {
+            border-bottom: none;
+        }
+
+        .attempt-time {
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .attempt.best .attempt-time {
+            color: #8f8;
+        }
+
+        .reset-btn {
+            padding: 15px 40px;
+            font-size: 1rem;
+            border: none;
+            border-radius: 50px;
+            background: linear-gradient(145deg, #ffffff, #cccccc);
+            color: #1a1a1a;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 20px rgba(255, 255, 255, 0.2);
+        }
+
+        .reset-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 255, 255, 0.3);
+        }
+
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: -1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            animation: float 15s infinite;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 1;
+            }
+
+            90% {
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(-100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        .rating {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin-top: 10px;
+        }
+
+        .rating.excellent {
+            background: #4a4a4a;
+            color: #8f8;
+        }
+
+        .rating.good {
+            background: #4a4a4a;
+            color: #8af;
+        }
+
+        .rating.average {
+            background: #4a4a4a;
+            color: #ff8;
+        }
+
+        .rating.slow {
+            background: #4a4a4a;
+            color: #f88;
+        }
+
+        @media (max-width: 500px) {
+            .game-container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            #testArea {
+                height: 250px;
+            }
+
+            .test-text .time {
+                font-size: 3rem;
+            }
+
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <a href="../index.html" class="back-btn" id="backBtn">← Back</a>
+
+    <div class="lang-switcher">
+        <button class="lang-btn" id="langEN" onclick="setLanguage('en')">EN</button>
+        <button class="lang-btn active" id="langTR" onclick="setLanguage('tr')">TR</button>
+    </div>
+
+    <div class="particles" id="particles"></div>
+
+    <div class="game-container">
+        <h1 id="gameTitle">Tepki Süresi Testi</h1>
+        <p class="subtitle" id="subtitle">Ekran beyaza döndüğünde olabildiğince hızlı tıkla!</p>
+
+        <div id="testArea" class="waiting" onclick="handleClick()">
+            <div class="test-text" id="testText">Başlamak için tıkla</div>
+        </div>
+
+        <div class="stats-container">
+            <div class="stat-box">
+                <div class="stat-label" id="bestLabel">En İyi</div>
+                <div class="stat-value" id="bestTime">- ms</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label" id="avgLabel">Ortalama</div>
+                <div class="stat-value" id="avgTime">- ms</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label" id="attemptsLabel">Deneme</div>
+                <div class="stat-value" id="attempts">0</div>
+            </div>
+        </div>
+
+        <div class="attempts-list" id="attemptsList">
+            <div class="attempts-title" id="attemptsTitle">Son Denemeler</div>
+            <div id="attemptsContent">
+                <div style="color: #555; text-align: center; padding: 20px;" id="noAttempts">Henüz deneme yok</div>
+            </div>
+        </div>
+
+        <button class="reset-btn" onclick="resetStats()" id="resetBtn">Sıfırla</button>
+    </div>
+
+    <script>
+        // Dil sistemi
+        const translations = {
+            tr: {
+                back: '← Geri',
+                gameTitle: 'Tepki Süresi Testi',
+                subtitle: 'Ekran beyaza döndüğünde olabildiğince hızlı tıkla!',
+                clickToStart: 'Başlamak için tıkla',
+                wait: 'Bekle...',
+                click: 'TIKLA!',
+                tooEarly: 'Çok erken!',
+                tryAgain: 'Tekrar denemek için tıkla',
+                milliseconds: 'milisaniye',
+                bestLabel: 'En İyi',
+                avgLabel: 'Ortalama',
+                attemptsLabel: 'Deneme',
+                attemptsTitle: 'Son Denemeler',
+                noAttempts: 'Henüz deneme yok',
+                attempt: 'Deneme',
+                resetBtn: 'Sıfırla',
+                excellent: 'Mükemmel',
+                good: 'İyi',
+                average: 'Ortalama',
+                slow: 'Yavaş'
+            },
+            en: {
+                back: '← Back',
+                gameTitle: 'Reaction Time Test',
+                subtitle: 'Click as fast as you can when the screen turns white!',
+                clickToStart: 'Click to start',
+                wait: 'Wait...',
+                click: 'CLICK!',
+                tooEarly: 'Too early!',
+                tryAgain: 'Click to try again',
+                milliseconds: 'milliseconds',
+                bestLabel: 'Best',
+                avgLabel: 'Average',
+                attemptsLabel: 'Attempts',
+                attemptsTitle: 'Recent Attempts',
+                noAttempts: 'No attempts yet',
+                attempt: 'Attempt',
+                resetBtn: 'Reset',
+                excellent: 'Excellent',
+                good: 'Good',
+                average: 'Average',
+                slow: 'Slow'
+            }
+        };
+
+        let currentLang = localStorage.getItem('siteLang') || 'en';
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem('siteLang', lang);
+
+            document.getElementById('langTR').classList.toggle('active', lang === 'tr');
+            document.getElementById('langEN').classList.toggle('active', lang === 'en');
+
+            const t = translations[lang];
+            document.getElementById('backBtn').textContent = t.back;
+            document.getElementById('gameTitle').textContent = t.gameTitle;
+            document.getElementById('subtitle').textContent = t.subtitle;
+            document.getElementById('bestLabel').textContent = t.bestLabel;
+            document.getElementById('avgLabel').textContent = t.avgLabel;
+            document.getElementById('attemptsLabel').textContent = t.attemptsLabel;
+            document.getElementById('attemptsTitle').textContent = t.attemptsTitle;
+            document.getElementById('resetBtn').textContent = t.resetBtn;
+
+            if (state === 'waiting') {
+                document.getElementById('testText').textContent = t.clickToStart;
+            }
+            renderAttempts();
+        }
+
+        setLanguage(currentLang);
+        let state = 'waiting'; // waiting, ready, go, result, too-early
+        let startTime = 0;
+        let timeoutId = null;
+        let attempts = [];
+
+        // Parçacık efektleri
+        function createParticles() {
+            const container = document.getElementById('particles');
+            for (let i = 0; i < 30; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 15 + 's';
+                particle.style.animationDuration = (15 + Math.random() * 10) + 's';
+                container.appendChild(particle);
+            }
+        }
+        createParticles();
+
+        // Kayıtlı verileri yükle
+        const savedAttempts = localStorage.getItem('reactionAttempts');
+        if (savedAttempts) {
+            attempts = JSON.parse(savedAttempts);
+            updateStats();
+            renderAttempts();
+        }
+
+        function handleClick() {
+            const testArea = document.getElementById('testArea');
+            const testText = document.getElementById('testText');
+
+            switch (state) {
+                case 'waiting':
+                case 'result':
+                case 'too-early':
+                    // Bekleme moduna geç
+                    state = 'ready';
+                    testArea.className = 'ready';
+                    testText.innerHTML = 'Bekle...';
+
+                    // Rastgele süre sonra yeşile dön (1-5 saniye)
+                    const delay = 1000 + Math.random() * 4000;
+                    timeoutId = setTimeout(() => {
+                        state = 'go';
+                        testArea.className = 'go';
+                        testText.innerHTML = 'TIKLA!';
+                        startTime = performance.now();
+                    }, delay);
+                    break;
+
+                case 'ready':
+                    // Çok erken tıkladı
+                    clearTimeout(timeoutId);
+                    state = 'too-early';
+                    testArea.className = 'too-early';
+                    testText.innerHTML = 'Çok erken!<br><span style="font-size: 1rem; color: #888;">Tekrar denemek için tıkla</span>';
+                    break;
+
+                case 'go':
+                    // Tepki süresini hesapla
+                    const reactionTime = Math.round(performance.now() - startTime);
+                    state = 'result';
+                    testArea.className = 'result';
+
+                    const rating = getRating(reactionTime);
+                    testText.innerHTML = `
+                        <span class="time">${reactionTime}</span>
+                        <span class="unit">milisaniye</span>
+                        <span class="rating ${rating.class}">${rating.text}</span>
+                        <br><span style="font-size: 0.9rem; color: #666; margin-top: 15px; display: block;">Tekrar denemek için tıkla</span>
+                    `;
+
+                    // Sonucu kaydet
+                    attempts.unshift(reactionTime);
+                    if (attempts.length > 10) attempts.pop();
+                    localStorage.setItem('reactionAttempts', JSON.stringify(attempts));
+
+                    updateStats();
+                    renderAttempts();
+                    break;
+            }
+        }
+
+        function getRating(time) {
+            if (time < 150) return { text: 'Mükemmel', class: 'excellent' };
+            if (time < 200) return { text: 'İyi', class: 'good' };
+            if (time < 250) return { text: 'Ortalama', class: 'average' };
+            return { text: 'Yavaş', class: 'slow' };
+        }
+
+        function updateStats() {
+            const bestTime = document.getElementById('bestTime');
+            const avgTime = document.getElementById('avgTime');
+            const attemptsCount = document.getElementById('attempts');
+
+            if (attempts.length > 0) {
+                const best = Math.min(...attempts);
+                const avg = Math.round(attempts.reduce((a, b) => a + b, 0) / attempts.length);
+
+                bestTime.textContent = best + ' ms';
+                avgTime.textContent = avg + ' ms';
+                attemptsCount.textContent = attempts.length;
+            } else {
+                bestTime.textContent = '- ms';
+                avgTime.textContent = '- ms';
+                attemptsCount.textContent = '0';
+            }
+        }
+
+        function renderAttempts() {
+            const container = document.getElementById('attemptsContent');
+
+            if (attempts.length === 0) {
+                container.innerHTML = '<div style="color: #555; text-align: center; padding: 20px;">Henüz deneme yok</div>';
+                return;
+            }
+
+            const best = Math.min(...attempts);
+
+            container.innerHTML = attempts.map((time, index) => `
+                <div class="attempt ${time === best ? 'best' : ''}">
+                    <span>Deneme ${attempts.length - index}</span>
+                    <span class="attempt-time">${time} ms</span>
+                </div>
+            `).join('');
+        }
+
+        function resetStats() {
+            attempts = [];
+            localStorage.removeItem('reactionAttempts');
+            updateStats();
+            renderAttempts();
+
+            // Test alanını sıfırla
+            state = 'waiting';
+            document.getElementById('testArea').className = 'waiting';
+            document.getElementById('testText').innerHTML = 'Başlamak için tıkla';
+
+            if (timeoutId) {
+                clearTimeout(timeoutId);
+                timeoutId = null;
+            }
+        }
+
+        // Klavye ile de tıklama
+        document.addEventListener('keydown', (e) => {
+            if (e.key === ' ' || e.key === 'Enter') {
+                e.preventDefault();
+                handleClick();
+            }
+        });
+    </script>
+</body>
+
+</html>

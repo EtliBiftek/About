@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flappy Bird</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            text-decoration: none;
+            border-radius: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateX(-5px);
+        }
+
+        .lang-switcher {
+            position: fixed;
+            top: 70px;
+            right: 20px;
+            display: flex;
+            gap: 5px;
+            z-index: 1000;
+        }
+
+        .lang-btn {
+            padding: 8px 15px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #888;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .lang-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            color: #fff;
+        }
+
+        .lang-btn.active {
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #252525 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+        }
+
+        .game-container {
+            text-align: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        h1 {
+            color: #ffffff;
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+        }
+
+        .score-bar {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-bottom: 15px;
+        }
+
+        .score-item {
+            text-align: center;
+        }
+
+        .score-label {
+            color: #666;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+        }
+
+        .score-value {
+            color: #fff;
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+
+        .mode-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .mode-btn {
+            padding: 8px 16px;
+            font-size: 0.85rem;
+            border: 2px solid #444;
+            border-radius: 25px;
+            background: transparent;
+            color: #888;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .mode-btn:hover {
+            border-color: #666;
+            color: #aaa;
+        }
+
+        .mode-btn.active {
+            border-color: #fff;
+            color: #fff;
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+        }
+
+        .mode-btn.debug-btn.active {
+            border-color: #ff6b6b;
+            color: #ff6b6b;
+            background: rgba(255, 107, 107, 0.1);
+            box-shadow: 0 0 15px rgba(255, 107, 107, 0.3);
+        }
+
+        .mode-btn.ai-btn.active {
+            border-color: #4ecdc4;
+            color: #4ecdc4;
+            background: rgba(78, 205, 196, 0.1);
+            box-shadow: 0 0 15px rgba(78, 205, 196, 0.3);
+        }
+
+        .mode-btn.easy-btn.active {
+            border-color: #95e77e;
+            color: #95e77e;
+            background: rgba(149, 231, 126, 0.1);
+            box-shadow: 0 0 15px rgba(149, 231, 126, 0.3);
+        }
+
+        #gameCanvas {
+            border: 3px solid #666;
+            border-radius: 10px;
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+        }
+
+        .controls-info {
+            margin-top: 15px;
+            color: #666;
+            font-size: 0.85rem;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+
+        .overlay.hidden {
+            display: none;
+        }
+
+        .overlay-content {
+            text-align: center;
+            color: #fff;
+            animation: popIn 0.3s ease;
+        }
+
+        @keyframes popIn {
+            from {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .overlay-content h2 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+        }
+
+        .overlay-content p {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: #aaa;
+        }
+
+        .overlay-content .big-score {
+            font-size: 5rem;
+            color: #fff;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .play-btn {
+            padding: 20px 50px;
+            font-size: 1.3rem;
+            border: none;
+            border-radius: 50px;
+            background: linear-gradient(145deg, #ffffff, #cccccc);
+            color: #1a1a1a;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 20px rgba(255, 255, 255, 0.2);
+            margin-top: 20px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                box-shadow: 0 5px 30px rgba(255, 255, 255, 0.2);
+            }
+
+            50% {
+                box-shadow: 0 5px 50px rgba(255, 255, 255, 0.4);
+            }
+        }
+
+        .play-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 255, 255, 0.3);
+        }
+
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: -1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            animation: float 15s infinite;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 1;
+            }
+
+            90% {
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(-100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <a href="../index.html" class="back-btn" id="backBtn">← Back</a>
+
+    <div class="lang-switcher">
+        <button class="lang-btn" id="langEN" onclick="setLanguage('en')">EN</button>
+        <button class="lang-btn active" id="langTR" onclick="setLanguage('tr')">TR</button>
+    </div>
+
+    <div class="particles" id="particles"></div>
+
+    <div class="overlay" id="startOverlay">
+        <div class="overlay-content">
+            <h2>Flappy Bird</h2>
+            <p id="startDesc">Borulardan geçmeye çalış!</p>
+            <p style="font-size: 1rem; color: #555;" id="startControl">Tıkla veya Space tuşuna bas</p>
+            <button class="play-btn" onclick="startGame()" id="startBtn">Oyna</button>
+        </div>
+    </div>
+
+    <div class="overlay hidden" id="gameOverOverlay">
+        <div class="overlay-content">
+            <h2 id="gameOverTitle">Oyun Bitti!</h2>
+            <p id="scoreLabel">Skor</p>
+            <div class="big-score" id="finalScore">0</div>
+            <p id="newRecord" style="color: #8f8; display: none;">Yeni Rekor!</p>
+            <button class="play-btn" onclick="startGame()" id="restartBtn">Tekrar Oyna</button>
+        </div>
+    </div>
+
+    <div class="game-container">
+        <h1>Flappy Bird</h1>
+
+        <div class="score-bar">
+            <div class="score-item">
+                <div class="score-label" id="scoreLabelMain">Skor</div>
+                <div class="score-value" id="score">0</div>
+            </div>
+            <div class="score-item">
+                <div class="score-label" id="highScoreLabel">En Yüksek</div>
+                <div class="score-value" id="highScore">0</div>
+            </div>
+        </div>
+
+        <div class="mode-buttons">
+            <button class="mode-btn debug-btn" id="debugBtn" onclick="toggleDebug()">Debug</button>
+            <button class="mode-btn ai-btn" id="aiBtn" onclick="toggleAI()" id="aiBtnText">AI Mode</button>
+            <button class="mode-btn easy-btn" id="easyBtn" onclick="toggleEasy()" id="easyBtnText">Easy Mode</button>
+        </div>
+
+        <canvas id="gameCanvas" width="400" height="600"></canvas>
+
+        <div class="controls-info">
+            <p id="controlsText">Tıkla veya Space tuşuna bas</p>
+        </div>
+    </div>
+
+    <script>
+        // Dil sistemi
+        const translations = {
+            tr: {
+                back: '← Geri',
+                startDesc: 'Borulardan geçmeye çalış!',
+                startControl: 'Tıkla veya Space tuşuna bas',
+                startBtn: 'Oyna',
+                gameOverTitle: 'Oyun Bitti!',
+                scoreLabel: 'Skor',
+                newRecord: 'Yeni Rekor!',
+                restartBtn: 'Tekrar Oyna',
+                scoreLabelMain: 'Skor',
+                highScoreLabel: 'En Yüksek',
+                aiBtn: 'AI Modu',
+                easyBtn: 'Kolay Mod',
+                controlsText: 'Tıkla veya Space tuşuna bas'
+            },
+            en: {
+                back: '← Back',
+                startDesc: 'Try to pass through the pipes!',
+                startControl: 'Click or press Space',
+                startBtn: 'Play',
+                gameOverTitle: 'Game Over!',
+                scoreLabel: 'Score',
+                newRecord: 'New Record!',
+                restartBtn: 'Play Again',
+                scoreLabelMain: 'Score',
+                highScoreLabel: 'High Score',
+                aiBtn: 'AI Mode',
+                easyBtn: 'Easy Mode',
+                controlsText: 'Click or press Space'
+            }
+        };
+
+        let currentLang = localStorage.getItem('siteLang') || 'en';
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem('siteLang', lang);
+
+            document.getElementById('langTR').classList.toggle('active', lang === 'tr');
+            document.getElementById('langEN').classList.toggle('active', lang === 'en');
+
+            const t = translations[lang];
+            document.getElementById('backBtn').textContent = t.back;
+            document.getElementById('startDesc').textContent = t.startDesc;
+            document.getElementById('startControl').textContent = t.startControl;
+            document.getElementById('startBtn').textContent = t.startBtn;
+            document.getElementById('gameOverTitle').textContent = t.gameOverTitle;
+            document.getElementById('scoreLabel').textContent = t.scoreLabel;
+            document.getElementById('newRecord').textContent = t.newRecord;
+            document.getElementById('restartBtn').textContent = t.restartBtn;
+            document.getElementById('scoreLabelMain').textContent = t.scoreLabelMain;
+            document.getElementById('highScoreLabel').textContent = t.highScoreLabel;
+            document.getElementById('aiBtn').textContent = t.aiBtn;
+            document.getElementById('easyBtn').textContent = t.easyBtn;
+            document.getElementById('controlsText').textContent = t.controlsText;
+        }
+
+        setLanguage(currentLang);
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // 60 FPS sabitleri
+        const TARGET_FPS = 60;
+        const FRAME_TIME = 1000 / TARGET_FPS;
+
+        // Oyun sabitleri (60 FPS için ayarlandı)
+        const NORMAL_GRAVITY = 0.5;
+        const NORMAL_JUMP_FORCE = -8;
+        const NORMAL_PIPE_SPEED = 3;
+        const NORMAL_PIPE_GAP = 150;
+        const PIPE_WIDTH = 60;
+        const NORMAL_PIPE_SPAWN_INTERVAL = 1500;
+
+        // Kolay mod sabitleri
+        const EASY_GRAVITY = 0.35;
+        const EASY_JUMP_FORCE = -7;
+        const EASY_PIPE_SPEED = 2;
+        const EASY_PIPE_GAP = 200;
+        const EASY_PIPE_SPAWN_INTERVAL = 2000;
+
+        // Dinamik değerler
+        let GRAVITY = NORMAL_GRAVITY;
+        let JUMP_FORCE = NORMAL_JUMP_FORCE;
+        let PIPE_SPEED = NORMAL_PIPE_SPEED;
+        let PIPE_GAP = NORMAL_PIPE_GAP;
+        let PIPE_SPAWN_INTERVAL = NORMAL_PIPE_SPAWN_INTERVAL;
+
+        // Mod değişkenleri
+        let debugMode = false;
+        let aiMode = false;
+        let easyMode = false;
+        let isPaused = false;
+
+        // Oyun değişkenleri
+        let bird = { x: 80, y: 300, velocity: 0, size: 25 };
+        let pipes = [];
+        let score = 0;
+        let highScore = localStorage.getItem('flappyHighScore') || 0;
+        let isPlaying = false;
+        let gameOver = false;
+        let animationId = null;
+        let lastPipeSpawn = 0;
+        let lastTime = 0;
+        let accumulator = 0;
+
+        document.getElementById('highScore').textContent = highScore;
+
+        // Mod toggle fonksiyonları
+        function toggleDebug() {
+            debugMode = !debugMode;
+            document.getElementById('debugBtn').classList.toggle('active', debugMode);
+        }
+
+        function toggleAI() {
+            aiMode = !aiMode;
+            document.getElementById('aiBtn').classList.toggle('active', aiMode);
+
+            // AI açıldığında kolay modu da aç
+            if (aiMode && !easyMode) {
+                toggleEasy();
+            }
+        }
+
+        function toggleEasy() {
+            easyMode = !easyMode;
+            document.getElementById('easyBtn').classList.toggle('active', easyMode);
+
+            if (easyMode) {
+                GRAVITY = EASY_GRAVITY;
+                JUMP_FORCE = EASY_JUMP_FORCE;
+                PIPE_SPEED = EASY_PIPE_SPEED;
+                PIPE_GAP = EASY_PIPE_GAP;
+                PIPE_SPAWN_INTERVAL = EASY_PIPE_SPAWN_INTERVAL;
+            } else {
+                GRAVITY = NORMAL_GRAVITY;
+                JUMP_FORCE = NORMAL_JUMP_FORCE;
+                PIPE_SPEED = NORMAL_PIPE_SPEED;
+                PIPE_GAP = NORMAL_PIPE_GAP;
+                PIPE_SPAWN_INTERVAL = NORMAL_PIPE_SPAWN_INTERVAL;
+
+                // Kolay mod kapatıldığında AI modu da kapat
+                if (aiMode) {
+                    aiMode = false;
+                    document.getElementById('aiBtn').classList.remove('active');
+                }
+            }
+        }
+
+        function togglePause() {
+            if (!isPlaying || gameOver) return;
+            isPaused = !isPaused;
+
+            if (!isPaused) {
+                lastTime = performance.now();
+                accumulator = 0;
+                gameLoop();
+            }
+        }
+
+        // AI değişkenleri
+        let aiLastJumpFrame = 0;
+        let frameCount = 0;
+
+        // AI karar sistemi - Basit ve güvenilir
+        function aiDecision() {
+            if (!aiMode || !isPlaying || gameOver || isPaused) return;
+
+            frameCount++;
+
+            // Her 8 frame'de bir karar ver (çok sık zıplamayı engelle)
+            if (frameCount - aiLastJumpFrame < 8) return;
+
+            // Önümüzdeki boruyu bul
+            let targetPipe = null;
+            for (const pipe of pipes) {
+                if (pipe.x + PIPE_WIDTH > bird.x - bird.size) {
+                    targetPipe = pipe;
+                    break;
+                }
+            }
+
+            // Boru yoksa ortada kal
+            if (!targetPipe) {
+                if (bird.y > canvas.height / 2 && bird.velocity > 2) {
+                    jump();
+                    aiLastJumpFrame = frameCount;
+                }
+                return;
+            }
+
+            // Boşluğun ortası - hedefimiz burası
+            const gapCenter = targetPipe.topHeight + PIPE_GAP / 2;
+
+            // Çok basit mantık:
+            // 1. Kuş boşluğun ortasının altındaysa VE düşüyorsa → zıpla
+            // 2. Kuş boşluğun ortasının üstündeyse → zıplama
+
+            const belowCenter = bird.y > gapCenter;
+            const falling = bird.velocity > 0;
+            const risingFast = bird.velocity < -3;
+
+            // Güvenlik marjları
+            const topLimit = targetPipe.topHeight + bird.size + 35;
+            const bottomLimit = targetPipe.topHeight + PIPE_GAP - bird.size - 35;
+
+            let shouldJump = false;
+
+            // Ana kural: Ortanın altındayken ve düşerken zıpla
+            if (belowCenter && falling) {
+                shouldJump = true;
+            }
+
+            // Ortanın biraz altındayken bile zıpla (düşmese bile)
+            if (bird.y > gapCenter + 20) {
+                shouldJump = true;
+            }
+
+            // GÜVENLİK: Üst limite yakınsa ASLA zıplama
+            if (bird.y < topLimit) {
+                shouldJump = false;
+            }
+
+            // GÜVENLİK: Yukarı hızla gidiyorsa zıplama
+            if (risingFast) {
+                shouldJump = false;
+            }
+
+            // ACİL: Alt limite çok yakınsa MUTLAKA zıpla
+            if (bird.y > bottomLimit) {
+                shouldJump = true;
+            }
+
+            // ACİL: Zemine yakınsa zıpla
+            if (bird.y > canvas.height - 80) {
+                shouldJump = true;
+            }
+
+            // ACİL: Tavana yakınsa zıplama
+            if (bird.y < 50) {
+                shouldJump = false;
+            }
+
+            if (shouldJump) {
+                jump();
+                aiLastJumpFrame = frameCount;
+            }
+        }
+
+        // Parçacık efektleri
+        function createParticles() {
+            const container = document.getElementById('particles');
+            for (let i = 0; i < 30; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 15 + 's';
+                particle.style.animationDuration = (15 + Math.random() * 10) + 's';
+                container.appendChild(particle);
+            }
+        }
+        createParticles();
+
+        function startGame() {
+            document.getElementById('startOverlay').classList.add('hidden');
+            document.getElementById('gameOverOverlay').classList.add('hidden');
+            document.getElementById('newRecord').style.display = 'none';
+
+            bird = { x: 80, y: 300, velocity: 0, size: 25 };
+            pipes = [];
+            score = 0;
+            isPlaying = true;
+            gameOver = false;
+            isPaused = false;
+            lastPipeSpawn = 0;
+
+            document.getElementById('score').textContent = '0';
+
+            if (animationId) cancelAnimationFrame(animationId);
+            lastTime = performance.now();
+            accumulator = 0;
+            gameLoop();
+        }
+
+        function jump() {
+            if (!isPlaying || gameOver || isPaused) return;
+            bird.velocity = JUMP_FORCE;
+        }
+
+        function spawnPipe() {
+            const minHeight = 80;
+            const maxHeight = canvas.height - PIPE_GAP - minHeight - 50;
+            const topHeight = minHeight + Math.random() * maxHeight;
+
+            pipes.push({
+                x: canvas.width,
+                topHeight: topHeight,
+                bottomY: topHeight + PIPE_GAP,
+                passed: false
+            });
+        }
+
+        function update() {
+            if (!isPlaying || gameOver || isPaused) return;
+
+            // AI karar ver
+            aiDecision();
+
+            // Yerçekimi
+            bird.velocity += GRAVITY;
+            bird.y += bird.velocity;
+
+            // Boru oluşturma
+            const now = Date.now();
+            if (now - lastPipeSpawn > PIPE_SPAWN_INTERVAL) {
+                spawnPipe();
+                lastPipeSpawn = now;
+            }
+
+            // Boruları hareket ettir
+            pipes.forEach(pipe => {
+                pipe.x -= PIPE_SPEED;
+
+                // Skor kontrolü
+                if (!pipe.passed && pipe.x + PIPE_WIDTH < bird.x) {
+                    pipe.passed = true;
+                    score++;
+                    document.getElementById('score').textContent = score;
+                }
+            });
+
+            // Geçmiş boruları kaldır
+            pipes = pipes.filter(pipe => pipe.x + PIPE_WIDTH > 0);
+
+            // Çarpışma kontrolü
+            if (checkCollision()) {
+                endGame();
+            }
+        }
+
+        function checkCollision() {
+            // Zemin ve tavan
+            if (bird.y - bird.size < 0 || bird.y + bird.size > canvas.height) {
+                return true;
+            }
+
+            // Borular
+            for (const pipe of pipes) {
+                if (bird.x + bird.size > pipe.x && bird.x - bird.size < pipe.x + PIPE_WIDTH) {
+                    if (bird.y - bird.size < pipe.topHeight || bird.y + bird.size > pipe.bottomY) {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        function draw() {
+            // Arka plan
+            ctx.fillStyle = '#0a0a0a';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Grid efekti
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.03)';
+            ctx.lineWidth = 1;
+            for (let i = 0; i < canvas.width; i += 30) {
+                ctx.beginPath();
+                ctx.moveTo(i, 0);
+                ctx.lineTo(i, canvas.height);
+                ctx.stroke();
+            }
+            for (let i = 0; i < canvas.height; i += 30) {
+                ctx.beginPath();
+                ctx.moveTo(0, i);
+                ctx.lineTo(canvas.width, i);
+                ctx.stroke();
+            }
+
+            // Borular
+            pipes.forEach(pipe => {
+                // Üst boru
+                ctx.fillStyle = easyMode ? '#3a5a3a' : '#444';
+                ctx.fillRect(pipe.x, 0, PIPE_WIDTH, pipe.topHeight);
+
+                // Üst boru kapağı
+                ctx.fillStyle = easyMode ? '#4a6a4a' : '#555';
+                ctx.fillRect(pipe.x - 5, pipe.topHeight - 25, PIPE_WIDTH + 10, 25);
+
+                // Alt boru
+                ctx.fillStyle = easyMode ? '#3a5a3a' : '#444';
+                ctx.fillRect(pipe.x, pipe.bottomY, PIPE_WIDTH, canvas.height - pipe.bottomY);
+
+                // Alt boru kapağı
+                ctx.fillStyle = easyMode ? '#4a6a4a' : '#555';
+                ctx.fillRect(pipe.x - 5, pipe.bottomY, PIPE_WIDTH + 10, 25);
+
+                // Boru kenar efekti
+                ctx.strokeStyle = easyMode ? '#5a8a5a' : '#666';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(pipe.x, 0, PIPE_WIDTH, pipe.topHeight);
+                ctx.strokeRect(pipe.x, pipe.bottomY, PIPE_WIDTH, canvas.height - pipe.bottomY);
+
+                // Debug: Boru hedef göstergesi
+                if (debugMode) {
+                    const gapCenter = pipe.topHeight + PIPE_GAP / 2;
+                    ctx.strokeStyle = '#4ecdc4';
+                    ctx.setLineDash([5, 5]);
+                    ctx.beginPath();
+                    ctx.moveTo(pipe.x, gapCenter);
+                    ctx.lineTo(pipe.x + PIPE_WIDTH, gapCenter);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                }
+            });
+
+            // Kuş
+            drawBird();
+
+            // Zemin
+            ctx.fillStyle = '#333';
+            ctx.fillRect(0, canvas.height - 3, canvas.width, 3);
+
+            // Debug bilgileri
+            if (debugMode) {
+                drawDebugInfo();
+            }
+
+            // Duraklatma ekranı
+            if (isPaused) {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                ctx.fillStyle = '#fff';
+                ctx.font = 'bold 40px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText('DURAKLATILDI', canvas.width / 2, canvas.height / 2 - 20);
+
+                ctx.font = '20px Arial';
+                ctx.fillStyle = '#aaa';
+                ctx.fillText('Devam etmek için ESC', canvas.width / 2, canvas.height / 2 + 20);
+            }
+
+            // AI göstergesi
+            if (aiMode && isPlaying && !gameOver) {
+                ctx.fillStyle = '#4ecdc4';
+                ctx.font = 'bold 14px Arial';
+                ctx.textAlign = 'left';
+                ctx.fillText('AI AKTİF (KOLAY MOD OTOMATİK AÇILIR)', 10, 25);
+            }
+
+            // Kolay mod göstergesi
+            if (easyMode && isPlaying && !gameOver) {
+                ctx.fillStyle = '#95e77e';
+                ctx.font = 'bold 14px Arial';
+                ctx.textAlign = 'left';
+                ctx.fillText('KOLAY MOD', 10, aiMode ? 45 : 25);
+            }
+        }
+
+        function drawDebugInfo() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+            ctx.fillRect(canvas.width - 160, 5, 155, 140);
+
+            ctx.strokeStyle = '#ff6b6b';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(canvas.width - 160, 5, 155, 140);
+
+            ctx.fillStyle = '#ff6b6b';
+            ctx.font = 'bold 12px monospace';
+            ctx.textAlign = 'left';
+
+            const debugLines = [
+                `DEBUG MOD`,
+                `━━━━━━━━━━━━━`,
+                `Kuş Y: ${bird.y.toFixed(1)}`,
+                `Hız: ${bird.velocity.toFixed(2)}`,
+                `Borular: ${pipes.length}`,
+                `Skor: ${score}`,
+                `Yerçekimi: ${GRAVITY}`,
+                `Boşluk: ${PIPE_GAP}px`,
+                `AI: ${aiMode ? 'AÇIK' : 'KAPALI'}`
+            ];
+
+            debugLines.forEach((line, i) => {
+                ctx.fillText(line, canvas.width - 150, 22 + i * 14);
+            });
+
+            // Kuş hitbox göster
+            ctx.strokeStyle = '#ff6b6b';
+            ctx.setLineDash([3, 3]);
+            ctx.strokeRect(bird.x - bird.size, bird.y - bird.size, bird.size * 2, bird.size * 2);
+            ctx.setLineDash([]);
+        }
+
+        function drawBird() {
+            ctx.save();
+            ctx.translate(bird.x, bird.y);
+
+            // Kuş dönüşü (hıza göre)
+            const rotation = Math.min(Math.max(bird.velocity * 3, -30), 90) * Math.PI / 180;
+            ctx.rotate(rotation);
+
+            // Kuş gövdesi
+            ctx.fillStyle = aiMode ? '#4ecdc4' : (easyMode ? '#95e77e' : '#fff');
+            ctx.beginPath();
+            ctx.ellipse(0, 0, bird.size, bird.size * 0.8, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Gözler
+            ctx.fillStyle = '#1a1a1a';
+            ctx.beginPath();
+            ctx.arc(8, -5, 6, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Göz parlaklığı
+            ctx.fillStyle = '#fff';
+            ctx.beginPath();
+            ctx.arc(10, -7, 2, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Gaga
+            ctx.fillStyle = '#888';
+            ctx.beginPath();
+            ctx.moveTo(20, 0);
+            ctx.lineTo(30, 3);
+            ctx.lineTo(20, 8);
+            ctx.closePath();
+            ctx.fill();
+
+            // Kanat
+            ctx.fillStyle = aiMode ? '#3dbdb5' : (easyMode ? '#7bc96a' : '#ccc');
+            ctx.beginPath();
+            const wingY = Math.sin(Date.now() / 50) * 5;
+            ctx.ellipse(-5, wingY, 12, 8, -0.3, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.restore();
+        }
+
+        function endGame() {
+            gameOver = true;
+            isPlaying = false;
+
+            // High score güncelle
+            if (score > highScore) {
+                highScore = score;
+                localStorage.setItem('flappyHighScore', highScore);
+                document.getElementById('highScore').textContent = highScore;
+                document.getElementById('newRecord').style.display = 'block';
+            }
+
+            document.getElementById('finalScore').textContent = score;
+
+            setTimeout(() => {
+                document.getElementById('gameOverOverlay').classList.remove('hidden');
+            }, 500);
+        }
+
+        function gameLoop(currentTime = performance.now()) {
+            if (isPaused) {
+                draw();
+                return;
+            }
+
+            animationId = requestAnimationFrame(gameLoop);
+
+            const deltaTime = currentTime - lastTime;
+            lastTime = currentTime;
+
+            accumulator += deltaTime;
+
+            // 60 FPS'e sabitlenmiş güncelleme
+            while (accumulator >= FRAME_TIME) {
+                update();
+                accumulator -= FRAME_TIME;
+            }
+
+            draw();
+        }
+
+        // Kontroller
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                togglePause();
+            } else if (e.key === ' ' || e.key === 'ArrowUp') {
+                e.preventDefault();
+                if (isPaused) return;
+                if (!isPlaying && !gameOver) {
+                    startGame();
+                } else {
+                    jump();
+                }
+            }
+        });
+
+        canvas.addEventListener('click', () => {
+            if (isPaused) {
+                togglePause();
+                return;
+            }
+            if (!isPlaying && !gameOver) {
+                startGame();
+            } else {
+                jump();
+            }
+        });
+
+        // Dokunmatik kontrol
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            if (isPaused) {
+                togglePause();
+                return;
+            }
+            if (!isPlaying && !gameOver) {
+                startGame();
+            } else {
+                jump();
+            }
+        });
+
+        // İlk çizim
+        draw();
+    </script>
+</body>
+
+</html>

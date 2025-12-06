@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Pifo's Counter-Strike 2 Settings</title>
+    <style>
+        :root {
+            --bg: #0a0a0a;
+            --panel: #1a1a1a;
+            --panel-2: #2a2a2a;
+            --border: #333333;
+            --text: #ffffff;
+            --muted: #888888;
+            --accent: #ffffff;
+            --white: #ffffff;
+        }
+
+        .lang-switcher {
+            position: fixed;
+            top: 70px;
+            right: 20px;
+            display: flex;
+            gap: 5px;
+            z-index: 1000;
+        }
+
+        .lang-btn {
+            padding: 8px 15px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #888;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .lang-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            color: #fff;
+        }
+
+        .lang-btn.active {
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #1a1a1a;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #666;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #888;
+        }
+
+        html {
+            height: 100%;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, var(--bg) 0%, #1a1a1a 50%, #252525 100%);
+            background-attachment: fixed;
+            background-size: cover;
+            color: var(--text);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1180px;
+            margin: 0 auto;
+        }
+
+        /* Toolbar */
+        .toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 18px 0 20px;
+            animation: fadeInDown 0.5s ease-out forwards;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .tabs {
+            display: flex;
+            gap: 8px;
+        }
+
+        .tab {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text);
+            border: 1px solid var(--border);
+            border-bottom: 2px solid transparent;
+            padding: 10px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tab--active {
+            border-color: var(--border);
+            border-bottom-color: var(--accent);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .note {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            color: var(--muted);
+            padding: 10px 14px;
+            border-radius: 8px;
+            width: 100%;
+            backdrop-filter: blur(10px);
+        }
+
+        .note code {
+            color: var(--accent);
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        /* Grid layout */
+        .layout {
+            display: grid;
+            grid-template-columns: minmax(0, 320px) minmax(0, 1fr);
+            gap: 20px;
+        }
+
+        /* Cards */
+        .card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transform: scaleX(0);
+            transition: transform 0.5s ease;
+        }
+
+        .card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .card+.card {
+            margin-top: 16px;
+        }
+
+        .card__header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 14px 0 14px;
+        }
+
+        .card__header h3 {
+            margin: 0;
+            font-size: 15px;
+            color: var(--accent);
+        }
+
+        .copy-btn {
+            background: transparent;
+            color: var(--text);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 6px 10px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            border-color: var(--accent);
+            background: linear-gradient(145deg, #ffffff, #cccccc);
+            color: var(--bg);
+        }
+
+        .copy-btn:active {
+            transform: translateY(1px);
+        }
+
+        /* Card entrance */
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .sidebar .card,
+        .main .card {
+            opacity: 0;
+            transform: translateY(10px);
+            animation: fadeUp 0.4s ease forwards;
+        }
+
+        .sidebar .card:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .sidebar .card:nth-child(2) {
+            animation-delay: 0.15s;
+        }
+
+        .sidebar .card:nth-child(3) {
+            animation-delay: 0.2s;
+        }
+
+        .sidebar .card:nth-child(4) {
+            animation-delay: 0.25s;
+        }
+
+        .sidebar .card:nth-child(5) {
+            animation-delay: 0.3s;
+        }
+
+        .main .card:nth-child(1) {
+            animation-delay: 0.15s;
+        }
+
+        .main .card:nth-child(2) {
+            animation-delay: 0.25s;
+        }
+
+        .main .card:nth-child(3) {
+            animation-delay: 0.35s;
+        }
+
+        .card--code pre,
+        .card pre {
+            margin: 12px;
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 12px;
+            overflow: auto;
+            max-width: 100%;
+            white-space: pre-wrap;
+            word-break: break-word;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .card pre code {
+            color: var(--text);
+        }
+
+        .kv {
+            padding: 12px 14px 14px 14px;
+            color: var(--muted);
+            font-family: monospace;
+            font-size: 12px;
+            word-break: break-all;
+        }
+
+        /* Table-like key/value */
+        .table {
+            padding: 6px 8px 12px 8px;
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 16px;
+            align-items: center;
+            padding: 10px 8px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            transition: background 0.2s ease;
+        }
+
+        .row:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .row:first-child {
+            border-top: none;
+        }
+
+        .cell--key {
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        .cell--val {
+            color: var(--white);
+            font-weight: 600;
+            min-width: 0;
+            word-break: break-word;
+            font-size: 14px;
+        }
+
+        /* Sidebar spacing */
+        .sidebar {
+            min-width: 0;
+        }
+
+        .main {
+            min-width: 0;
+        }
+
+        /* Particles */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: -1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            animation: float 15s infinite;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 1;
+            }
+
+            90% {
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(-100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 980px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+
+            .toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="particles" id="particles"></div>
+
+    <div class="lang-switcher">
+        <button class="lang-btn" id="langEN" onclick="setLanguage('en')">EN</button>
+        <button class="lang-btn active" id="langTR" onclick="setLanguage('tr')">TR</button>
+    </div>
+
+    <main class="container">
+        <section class="toolbar">
+            <div class="tabs">
+                <button class="tab tab--active" id="configTab">Config</button>
+            </div>
+            <div class="note" id="noteText">I use
+                <pre id="launch-opts" class="copy-target"><code>-allow_third_party_software</code></pre> for OBS.
+            </div>
+
+        </section>
+
+        <section class="layout">
+            <aside class="sidebar">
+                <article class="card card--code">
+                    <header class="card__header">
+                        <h3>Launch Options</h3>
+                        <button class="copy-btn" data-copy-target="#launch-opts">Copy</button>
+                    </header>
+                    <pre id="launch-opts"
+                        class="copy-target"><code>-allow_third_party_software -high -threads 16 -novid -nojoy -fps_max 0 -d_fcorpreload 1 -mat_queue_mode 1 -no-browser</code></pre>
+                </article>
+
+                <article class="card">
+                    <header class="card__header">
+                        <h3>Crosshair</h3>
+                        <button class="copy-btn" data-copy-text="CSGO-XVb9w-fB5iY-RRvAv-LAb58-ZAmDA">Copy</button>
+                    </header>
+                    <pre id="crosshair-opts" class="copy-target"><code>CSGO-NmcdV-ORLFj-vKC4W-LV6zW-4fWjM</code></pre>
+                </article>
+
+                <article class="card">
+                    <header class="card__header">
+                        <h3>Viewmodel</h3>
+                        <button class="copy-btn" data-copy-target="#viewmodel-opts">Copy</button>
+                    </header>
+                    <pre id="viewmodel-opts"
+                        class="copy-target"><code>viewmodel_fov 68; viewmodel_offset_x 2.5; viewmodel_offset_y 0; viewmodel_offset_z -1.5; viewmodel_presetpos 1;</code></pre>
+                </article>
+
+                <article class="card">
+                    <header class="card__header">
+                        <h3>HUD</h3>
+                        <button class="copy-btn" data-copy-target="#hud-opts">Copy</button>
+                    </header>
+                    <pre id="hud-opts"
+                        class="copy-target"><code>cl_hud_color 6;cl_showloadout true;safezonex 1;safezoney 1</code></pre>
+                </article>
+
+                <article class="card">
+                    <header class="card__header">
+                        <h3>Radar</h3>
+                        <button class="copy-btn" data-copy-target="#radar-opts">Copy</button>
+                    </header>
+                    <pre id="radar-opts"
+                        class="copy-target"><code>cl_hud_radar_scale 1;cl_radar_scale 0.25;cl_radar_always_centered true;cl_radar_rotate true;cl_radar_icon_scale_min 0.6</code></pre>
+                </article>
+            </aside>
+
+            <section class="main">
+                <article class="card">
+                    <header class="card__header">
+                        <h3 id="mouseSettingsTitle">Mouse Settings</h3>
+                    </header>
+                    <div class="table">
+                        <div class="row">
+                            <div class="cell cell--key" id="keyDpi">DPI</div>
+                            <div class="cell cell--val">4800</div>
+                        </div>
+                        <div class="row">
+                            <div class="cell cell--key" id="keySensitivity">Sensitivity</div>
+                            <div class="cell cell--val">0.2</div>
+                        </div>
+                        <div class="row">
+                            <div class="cell cell--key" id="keyZoom">Zoom Multiplier</div>
+                            <div class="cell cell--val">1</div>
+                        </div>
+                        <div class="row">
+                            <div class="cell cell--key" id="keyPolling">Polling rate</div>
+                            <div class="cell cell--val">1000 Hz</div>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="card">
+                    <header class="card__header">
+                        <h3 id="videoSettingsTitle">Video Settings</h3>
+                    </header>
+                    <div class="table">
+                        <div class="row">
+                            <div class="cell cell--key" id="keyBrightness">Brightness</div>
+                            <div class="cell cell--val" id="valBrightness">100%</div>
+                        </div>
+                        <div class="row">
+                            <div class="cell cell--key" id="keyScaling">Scaling mode</div>
+                            <div class="cell cell--val" id="valScaling">Stretched</div>
+                        </div>
+                        <div class="row">
+                            <div class="cell cell--key" id="keyAspect">Aspect Ratio</div>
+                            <div class="cell cell--val">4:3</div>
+                        </div>
+                        <div class="row">
+                            <div class="cell cell--key" id="keyResolution">Resolution</div>
+                            <div class="cell cell--val" id="valResolution">1024x768</div>
+                        </div>
+                        <div class="row">
+                            <div class="cell cell--key" id="keyDisplayMode">Display Mode</div>
+                            <div class="cell cell--val" id="valDisplayMode">Fullscreen</div>
+                        </div>
+                        <div class="row">
+                            <div class="cell cell--key" id="keyRefresh">Refresh Rate</div>
+                            <div class="cell cell--val" id="valRefresh">180 Hz</div>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="card">
+                    <header class="card__header">
+                        <h3 id="advancedVideoTitle">Advanced Video</h3>
+                    </header>
+                    <div class="table">
+                        <div class="row">
+                            <div class="cell cell--key" id="keyPlayerContrast">Player Contrast</div>
+                            <div class="cell cell--val" id="valPlayerContrast">Enabled</div>
+                        </div>
+                        <div class="row">
+                            <div class="cell cell--key" id="keyVsync">Vertical Sync</div>
+                            <div class="cell cell--val" id="valVsync">Disabled</div>
+                        </div>
+                        <div class="row">
+                            <div class="cell cell--key" id="keyMsaa">Sharpness Smoothing Mode</div>
+                            <div class="cell cell--val">4X MSAA</div>
+                        </div>
+                        <div class="row">
+                            <div class="cell cell--key" id="keyShadow">Universal Shadow Quality</div>
+                            <div class="cell cell--val" id="valShadow">Medium</div>
+                        </div>
+                        <div class="row">
+                            <div class="cell cell--key" id="keyTexture">Model / Texture Detail</div>
+                            <div class="cell cell--val" id="valTexture">Low</div>
+                        </div>
+                        <div class="row">
+                            <div class="cell cell--key" id="keyFiltering">Texture Filtering Mode</div>
+                            <div class="cell cell--val">4X</div>
+                        </div>
+                        <div class="row">
+                            <div class="cell cell--key" id="keyShader">Shader Detail</div>
+                            <div class="cell cell--val" id="valShader">Low</div>
+                        </div>
+                        <div class="row">
+                            <div class="cell cell--key" id="keyParticle">Particle Detail</div>
+                            <div class="cell cell--val" id="valParticle">Low</div>
+                        </div>
+                        <div class="row">
+                            <div class="cell cell--key" id="keyOcclusion">Environment Occlusion</div>
+                            <div class="cell cell--val" id="valOcclusion">Disabled</div>
+                        </div>
+                        <div class="row">
+                            <div class="cell cell--key" id="keyHdr">High Dynamic Range</div>
+                            <div class="cell cell--val" id="valHdr">Quality</div>
+                        </div>
+                        <div class="row">
+                            <div class="cell cell--key" id="keyFsr">FidelityFX Super Resolution</div>
+                            <div class="cell cell--val" id="valFsr">Disabled (Highest Quality)</div>
+                        </div>
+                        <div class="row">
+                            <div class="cell cell--key">NVIDIA Reflex</div>
+                            <div class="cell cell--val" id="valReflex">Disabled</div>
+                        </div>
+                    </div>
+                </article>
+            </section>
+        </section>
+    </main>
+
+    <script>
+        // Dil sistemi
+        const translations = {
+            tr: {
+                configTab: 'Ayarlar',
+                noteText: 'OBS için <code>-allow_third_party_software</code> kullanıyorum.',
+                mouseSettingsTitle: 'Fare Ayarları',
+                videoSettingsTitle: 'Video Ayarları',
+                advancedVideoTitle: 'Gelişmiş Video',
+                // Mouse Settings
+                keyDpi: 'DPI',
+                keySensitivity: 'Hassasiyet',
+                keyZoom: 'Yakınlaştırma Çarpanı',
+                keyPolling: 'Yoklama Hızı',
+                // Video Settings
+                keyBrightness: 'Parlaklık',
+                valBrightness: '%100',
+                keyScaling: 'Ölçekleme Modu',
+                valScaling: 'Gergin',
+                keyAspect: 'En Boy Oranı',
+                keyResolution: 'Çözünürlük',
+                valResolution: '1024x768',
+                keyDisplayMode: 'Görüntü Modu',
+                valDisplayMode: 'Tam Ekran',
+                keyRefresh: 'Yenileme Hızı',
+                valRefresh: '180 Hz',
+                // Advanced Video
+                keyPlayerContrast: 'Oyuncu Kontrastı',
+                valPlayerContrast: 'Açık',
+                keyVsync: 'Dikey Senkron',
+                valVsync: 'Kapalı',
+                keyMsaa: 'Keskinlik Yumuşatma Modu',
+                keyShadow: 'Evrensel Gölge Kalitesi',
+                valShadow: 'Orta',
+                keyTexture: 'Model / Doku Detayı',
+                valTexture: 'Düşük',
+                keyFiltering: 'Doku Filtreleme Modu',
+                keyShader: 'Shader Detayı',
+                valShader: 'Düşük',
+                keyParticle: 'Partikül Detayı',
+                valParticle: 'Düşük',
+                keyOcclusion: 'Ortam Tıkanıklığı',
+                valOcclusion: 'Kapalı',
+                keyHdr: 'Yüksek Dinamik Aralık',
+                valHdr: 'Quality',
+                keyFsr: 'FidelityFX Süper Çözünürlük',
+                valFsr: 'Disabled (Highest Quality)',
+                valReflex: 'Disabled'
+            },
+            en: {
+                configTab: 'Config',
+                noteText: 'I use <code>-allow_third_party_software</code> for OBS.',
+                mouseSettingsTitle: 'Mouse Settings',
+                videoSettingsTitle: 'Video Settings',
+                advancedVideoTitle: 'Advanced Video',
+                // Mouse Settings
+                keyDpi: 'DPI',
+                keySensitivity: 'Sensitivity',
+                keyZoom: 'Zoom Multiplier',
+                keyPolling: 'Polling rate',
+                // Video Settings
+                keyBrightness: 'Brightness',
+                valBrightness: '100%',
+                keyScaling: 'Scaling mode',
+                valScaling: 'Stretched',
+                keyAspect: 'Aspect Ratio',
+                keyResolution: 'Resolution',
+                valResolution: '1024x768',
+                keyDisplayMode: 'Display Mode',
+                valDisplayMode: 'Fullscreen',
+                keyRefresh: 'Refresh Rate',
+                valRefresh: '180 Hz',
+                // Advanced Video
+                keyPlayerContrast: 'Player Contrast',
+                valPlayerContrast: 'Enabled',
+                keyVsync: 'Vertical Sync',
+                valVsync: 'Disabled',
+                keyMsaa: 'Sharpness Smoothing Mode',
+                keyShadow: 'Universal Shadow Quality',
+                valShadow: 'Medium',
+                keyTexture: 'Model / Texture Detail',
+                valTexture: 'Low',
+                keyFiltering: 'Texture Filtering Mode',
+                keyShader: 'Shader Detail',
+                valShader: 'Low',
+                keyParticle: 'Particle Detail',
+                valParticle: 'Low',
+                keyOcclusion: 'Environment Occlusion',
+                valOcclusion: 'Disabled',
+                keyHdr: 'High Dynamic Range',
+                valHdr: 'Quality',
+                keyFsr: 'FidelityFX Super Resolution',
+                valFsr: 'Disabled (Highest Quality)',
+                valReflex: 'Disabled'
+            }
+        };
+
+        let currentLang = localStorage.getItem('siteLang') || 'en';
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem('siteLang', lang);
+
+            document.getElementById('langTR').classList.toggle('active', lang === 'tr');
+            document.getElementById('langEN').classList.toggle('active', lang === 'en');
+
+            const t = translations[lang];
+            document.getElementById('configTab').textContent = t.configTab;
+            document.getElementById('noteText').innerHTML = t.noteText;
+            document.getElementById('mouseSettingsTitle').textContent = t.mouseSettingsTitle;
+            document.getElementById('videoSettingsTitle').textContent = t.videoSettingsTitle;
+            document.getElementById('advancedVideoTitle').textContent = t.advancedVideoTitle;
+            // Mouse Settings
+            document.getElementById('keyDpi').textContent = t.keyDpi;
+            document.getElementById('keySensitivity').textContent = t.keySensitivity;
+            document.getElementById('keyZoom').textContent = t.keyZoom;
+            document.getElementById('keyPolling').textContent = t.keyPolling;
+            // Video Settings
+            document.getElementById('keyBrightness').textContent = t.keyBrightness;
+            document.getElementById('valBrightness').textContent = t.valBrightness;
+            document.getElementById('keyScaling').textContent = t.keyScaling;
+            document.getElementById('valScaling').textContent = t.valScaling;
+            document.getElementById('keyAspect').textContent = t.keyAspect;
+            document.getElementById('keyResolution').textContent = t.keyResolution;
+            document.getElementById('valResolution').textContent = t.valResolution;
+            document.getElementById('keyDisplayMode').textContent = t.keyDisplayMode;
+            document.getElementById('valDisplayMode').textContent = t.valDisplayMode;
+            document.getElementById('keyRefresh').textContent = t.keyRefresh;
+            document.getElementById('valRefresh').textContent = t.valRefresh;
+            // Advanced Video
+            document.getElementById('keyPlayerContrast').textContent = t.keyPlayerContrast;
+            document.getElementById('valPlayerContrast').textContent = t.valPlayerContrast;
+            document.getElementById('keyVsync').textContent = t.keyVsync;
+            document.getElementById('valVsync').textContent = t.valVsync;
+            document.getElementById('keyMsaa').textContent = t.keyMsaa;
+            document.getElementById('keyShadow').textContent = t.keyShadow;
+            document.getElementById('valShadow').textContent = t.valShadow;
+            document.getElementById('keyTexture').textContent = t.keyTexture;
+            document.getElementById('valTexture').textContent = t.valTexture;
+            document.getElementById('keyFiltering').textContent = t.keyFiltering;
+            document.getElementById('keyShader').textContent = t.keyShader;
+            document.getElementById('valShader').textContent = t.valShader;
+            document.getElementById('keyParticle').textContent = t.keyParticle;
+            document.getElementById('valParticle').textContent = t.valParticle;
+            document.getElementById('keyOcclusion').textContent = t.keyOcclusion;
+            document.getElementById('valOcclusion').textContent = t.valOcclusion;
+            document.getElementById('keyHdr').textContent = t.keyHdr;
+            document.getElementById('valHdr').textContent = t.valHdr;
+            document.getElementById('keyFsr').textContent = t.keyFsr;
+            document.getElementById('valFsr').textContent = t.valFsr;
+            document.getElementById('valReflex').textContent = t.valReflex;
+        }
+
+        setLanguage(currentLang);
+
+        // Particles
+        function createParticles() {
+            const container = document.getElementById('particles');
+            for (let i = 0; i < 30; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 15 + 's';
+                particle.style.animationDuration = (15 + Math.random() * 10) + 's';
+                container.appendChild(particle);
+            }
+        }
+        createParticles();
+
+        // Copy functionality
+        document.addEventListener("click", async (event) => {
+            const target = event.target;
+            if (!(target instanceof HTMLElement)) return;
+            if (!target.classList.contains("copy-btn")) return;
+
+            const targetSelector = target.getAttribute("data-copy-target");
+            const explicitText = target.getAttribute("data-copy-text");
+
+            let textToCopy = explicitText || "";
+            if (!textToCopy && targetSelector) {
+                const el = document.querySelector(targetSelector);
+                if (el) {
+                    textToCopy = el.textContent || "";
+                }
+            }
+
+            if (!textToCopy.trim()) return;
+
+            try {
+                await navigator.clipboard.writeText(textToCopy.trim());
+                target.textContent = "Copied!";
+                target.style.background = "linear-gradient(145deg, #ffffff, #cccccc)";
+                target.style.color = "#0a0a0a";
+                setTimeout(() => {
+                    target.textContent = "Copy";
+                    target.style.background = "";
+                    target.style.color = "";
+                }, 1200);
+            } catch (err) {
+                console.error("Copy Error", err);
+            }
+        });
+    </script>
+</body>
+
+</html>

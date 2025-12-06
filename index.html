@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>PIFO - Counter Strike 2 Player</title>
+    <style>
+        :root {
+            --bg-dark: #0a0a0a;
+            --card-bg: #1a1a1a;
+            --text-primary: #ffffff;
+            --text-secondary: #888888;
+            --accent: #ffffff;
+            --accent-hover: #cccccc;
+            --border: #333333;
+            --hover-bg: #2a2a2a;
+            --loading-bg: #0a0a0a;
+        }
+
+        .lang-switcher {
+            position: fixed;
+            top: 70px;
+            right: 20px;
+            display: flex;
+            gap: 5px;
+            z-index: 99;
+        }
+
+        .lang-btn {
+            padding: 8px 15px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #888;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .lang-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            color: #fff;
+        }
+
+        .lang-btn.active {
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, var(--bg-dark) 0%, #1a1a1a 50%, #252525 100%);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+            visibility: hidden;
+        }
+
+        body.loaded {
+            visibility: visible;
+        }
+
+        header {
+            text-align: center;
+            padding: 20px;
+            margin-bottom: 30px;
+            animation: fadeInDown 0.8s ease-out forwards;
+            opacity: 0;
+            animation-delay: 0.3s;
+        }
+
+        .brand {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: #ffffff;
+            text-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            opacity: .8;
+            margin: 10px 0;
+        }
+
+        .contact-bar {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
+            padding: 15px 25px;
+            border: 1px solid var(--border);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, .5);
+            backdrop-filter: blur(10px);
+            margin-top: 30px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-evenly;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 40px;
+            opacity: 0;
+            animation: slideInUp 0.6s ease-out forwards;
+            animation-delay: 0.6s;
+        }
+
+        .contact-item {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            text-align: center;
+        }
+
+        .contact-item a {
+            color: var(--accent);
+            text-decoration: none;
+            transition: color .3s ease;
+        }
+
+        .contact-item a:hover {
+            color: var(--accent-hover);
+            text-decoration: underline;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            max-width: 1400px;
+            margin: 0 auto;
+            opacity: 0;
+            animation: fadeIn 0.8s ease-out forwards;
+            animation-delay: 0.9s;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
+            padding: 25px;
+            border: 1px solid var(--border);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, .5);
+            transition: all .4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+            opacity: 0;
+        }
+
+        .card:nth-child(1) {
+            animation: slideInUp 0.6s ease-out forwards;
+            animation-delay: 1.2s;
+        }
+
+        .card:nth-child(2) {
+            animation: slideInUp 0.6s ease-out forwards;
+            animation-delay: 1.4s;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+            transform: scaleX(0);
+            transition: transform .6s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 15px 40px rgba(255, 255, 255, .1);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .card-number {
+            background: linear-gradient(145deg, #ffffff, #cccccc);
+            color: var(--bg-dark);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-right: 15px;
+            flex-shrink: 0;
+            box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
+        }
+
+        .card-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .section-title {
+            color: var(--accent);
+            font-size: 1.1rem;
+            margin: 20px 0 12px 0;
+            font-weight: 500;
+            opacity: 0.8;
+        }
+
+        ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        li {
+            padding: 8px 0 8px 25px;
+            position: relative;
+            color: var(--text-secondary);
+            transition: color .3s ease;
+        }
+
+        li:hover {
+            color: var(--text-primary);
+        }
+
+        li::before {
+            content: '•';
+            color: var(--accent);
+            position: absolute;
+            left: 0;
+            font-size: 1.2rem;
+        }
+
+        .highlight {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .btn {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--hover-bg);
+            color: var(--text-primary);
+            text-decoration: none;
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin: 8px 0;
+            transition: all .3s ease;
+            border: 1px solid var(--border);
+        }
+
+        .btn:hover {
+            background: linear-gradient(145deg, #ffffff, #cccccc);
+            color: var(--bg-dark);
+            transform: translateX(5px);
+            box-shadow: 0 5px 20px rgba(255, 255, 255, 0.2);
+        }
+
+        .arrow {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .link-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .link-list li {
+            padding: 0;
+        }
+
+        .link-list li::before {
+            display: none;
+        }
+
+        /* Loading Screen */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--loading-bg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            opacity: 1;
+            transition: opacity 0s ease;
+        }
+
+        .loading-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
+            display: none;
+        }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top: 4px solid var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .loading-text {
+            color: var(--text-primary);
+            margin-top: 20px;
+            font-size: 1.2rem;
+            text-align: center;
+            opacity: 0.7;
+        }
+
+        /* Particles */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: -1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            animation: float 15s infinite;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 1;
+            }
+
+            90% {
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(-100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        /* Animations */
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* Overlay styles */
+        .overlay-embed {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            bottom: 20px;
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 16px;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            display: none;
+            transform: scale(0.95);
+            transition: all 0.3s ease;
+            box-shadow: 0 0 50px rgba(255, 255, 255, 0.1);
+        }
+
+        .overlay-embed.is-open {
+            opacity: 1;
+            visibility: visible;
+            transform: scale(1);
+        }
+
+        .overlay-embed {
+            padding: 0;
+        }
+
+        #overlay-frame {
+            width: 100%;
+            height: 100%;
+            border: none;
+            border-radius: 16px;
+            display: block;
+            background: transparent;
+        }
+
+        .overlay-close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            z-index: 1001;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: var(--text-primary);
+            font-size: 24px;
+            cursor: pointer;
+            padding: 5px 12px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .overlay-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        @media (max-width: 768px) {
+            .contact-bar {
+                flex-direction: column;
+                text-align: center;
+                gap: 15px;
+            }
+
+            .card-number {
+                width: 35px;
+                height: 35px;
+                font-size: 1rem;
+            }
+
+            .card-title {
+                font-size: 1.2rem;
+            }
+
+            .brand {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Particles -->
+    <div class="particles" id="particles"></div>
+
+    <!-- Language Switcher -->
+    <div class="lang-switcher">
+        <button class="lang-btn" id="langEN" onclick="setLanguage('en')">EN</button>
+        <button class="lang-btn active" id="langTR" onclick="setLanguage('tr')">TR</button>
+    </div>
+
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <div style="text-align: center;">
+            <div class="spinner"></div>
+            <div class="loading-text"></div>
+        </div>
+    </div>
+
+    <header>
+        <h1 class="brand">PIFO</h1>
+        <p class="subtitle" id="subtitle1">Playing <span class="highlight">Counter Strike 2</span> for myself.</p>
+        <p class="subtitle" id="subtitle2">Who knows, maybe I'll play for <span class="highlight">Eternal Fire</span>
+            sometime.</p>
+
+        <div class="contact-bar">
+            <div class="contact-item">E-Mail: <a href="mailto:official.pifo@gmail.com">official.pifo@gmail.com</a></div>
+            <div class="contact-item">Twitter: <a href="https://x.com/PIFOcsgo" target="_blank">@PIFOcsgo</a></div>
+            <div class="contact-item">YouTube: <a href="https://www.youtube.com/@etlibiftek"
+                    target="_blank">@etlibiftek</a></div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <div class="card-number">1</div>
+                <div class="card-title" id="socialTitle">Social Links</div>
+            </div>
+            <div class="section-title" id="followMe">Follow Me:</div>
+            <ul class="link-list">
+                <li><a class="btn" href="https://x.com/PIFOcsgo" target="_blank"><span>Twitter</span><span
+                            class="arrow">›</span></a></li>
+                <li><a class="btn" href="https://www.youtube.com/@etlibiftek" target="_blank"><span>YouTube</span><span
+                            class="arrow">›</span></a></li>
+                <li><a class="btn" href="https://www.twitch.tv/etlibiftek" target="_blank"><span>Twitch</span><span
+                            class="arrow">›</span></a></li>
+                <li><a class="btn" href="https://github.com/EtliBiftek?tab=repositories"
+                        target="_blank"><span>GitHub</span><span class="arrow">›</span></a></li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <div class="card-number">2</div>
+                <div class="card-title" id="specialTitle">Special Content</div>
+            </div>
+            <div class="section-title" id="checkOut">Check These Out:</div>
+            <ul class="link-list">
+                <li><a class="btn embed-link" href="#" data-src="CounterStrike Settings/index.html"
+                        data-mode="overlay"><span id="csSettings">Counter Strike 2 Settings</span><span
+                            class="arrow">›</span></a></li>
+                <li><a class="btn embed-link" href="#" data-src="MyPc/index.html" data-mode="overlay"><span id="myPc">My
+                            Computer Parts</span><span class="arrow">›</span></a></li>
+                <li><a class="btn embed-link" href="#" data-src="GameSelect/index.html" data-mode="overlay"><span
+                            id="gameSelect">Game Select (Did it outta boredom.)</span><span class="arrow">›</span></a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Overlay -->
+    <div id="overlay-embed" class="overlay-embed" aria-hidden="true">
+        <iframe id="overlay-frame" title="Overlay content" loading="lazy"></iframe>
+        <button id="overlay-close" class="overlay-close" aria-label="Close">✕</button>
+    </div>
+
+    <script>
+        // Dil sistemi
+        const translations = {
+            tr: {
+                subtitle1: 'Kendim için <span class="highlight">Counter Strike 2</span> oynuyorum.',
+                subtitle2: 'Kim bilir, belki bir gün <span class="highlight">Eternal Fire</span> için oynarım.',
+                socialTitle: 'Sosyal Bağlantılar',
+                followMe: 'Beni Takip Et:',
+                specialTitle: 'Özel İçerik',
+                checkOut: 'Bunlara Göz At:',
+                csSettings: 'Counter Strike 2 Ayarları',
+                myPc: 'Bilgisayar Parçalarım',
+                gameSelect: 'Oyun Seçimi (Sıkıntıdan yaptım.)'
+            },
+            en: {
+                subtitle1: 'Playing <span class="highlight">Counter Strike 2</span> for myself.',
+                subtitle2: 'Who knows, maybe I\'ll play for <span class="highlight">Eternal Fire</span> sometime.',
+                socialTitle: 'Social Links',
+                followMe: 'Follow Me:',
+                specialTitle: 'Special Content',
+                checkOut: 'Check These Out:',
+                csSettings: 'Counter Strike 2 Settings',
+                myPc: 'My Computer Parts',
+                gameSelect: 'Game Select (Did it outta boredom.)'
+            }
+        };
+
+        let currentLang = localStorage.getItem('siteLang') || 'en';
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem('siteLang', lang);
+
+            document.getElementById('langTR').classList.toggle('active', lang === 'tr');
+            document.getElementById('langEN').classList.toggle('active', lang === 'en');
+
+            const t = translations[lang];
+            document.getElementById('subtitle1').innerHTML = t.subtitle1;
+            document.getElementById('subtitle2').innerHTML = t.subtitle2;
+            document.getElementById('socialTitle').textContent = t.socialTitle;
+            document.getElementById('followMe').textContent = t.followMe;
+            document.getElementById('specialTitle').textContent = t.specialTitle;
+            document.getElementById('checkOut').textContent = t.checkOut;
+            document.getElementById('csSettings').textContent = t.csSettings;
+            document.getElementById('myPc').textContent = t.myPc;
+            document.getElementById('gameSelect').textContent = t.gameSelect;
+        }
+
+        setLanguage(currentLang);
+
+        // Particles
+        function createParticles() {
+            const container = document.getElementById('particles');
+            for (let i = 0; i < 30; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 15 + 's';
+                particle.style.animationDuration = (15 + Math.random() * 10) + 's';
+                container.appendChild(particle);
+            }
+        }
+        createParticles();
+
+        // Loading Screen
+        window.addEventListener('load', function () {
+            const loadingScreen = document.getElementById('loadingScreen');
+            loadingScreen.style.opacity = '0';
+            loadingScreen.style.transition = 'opacity 0.5s ease';
+            setTimeout(function () {
+                loadingScreen.style.display = 'none';
+                document.body.classList.add('loaded');
+            }, 500);
+        });
+
+        // Overlay functionality
+        (function () {
+            var links = document.querySelectorAll('.embed-link');
+            var overlay = document.getElementById('overlay-embed');
+            var overlayFrame = document.getElementById('overlay-frame');
+            var overlayClose = document.getElementById('overlay-close');
+
+            function toSafePath(path) { return path.replace(/\s/g, '%20'); }
+
+            function openOverlay(src) {
+                if (!overlay || !overlayFrame) return;
+                overlay.style.display = 'block';
+                requestAnimationFrame(function () {
+                    overlayFrame.setAttribute('src', toSafePath(src));
+                    overlay.setAttribute('aria-hidden', 'false');
+                    overlay.classList.add('is-open');
+                });
+            }
+
+            function closeOverlay() {
+                if (!overlay || !overlayFrame) return;
+                overlay.classList.remove('is-open');
+                overlay.setAttribute('aria-hidden', 'true');
+                setTimeout(() => {
+                    overlay.style.display = 'none';
+                    overlayFrame.setAttribute('src', '');
+                }, 300);
+            }
+
+            if (overlayClose) overlayClose.addEventListener('click', closeOverlay);
+            document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') closeOverlay(); });
+            links.forEach(function (link) {
+                link.addEventListener('click', function (ev) {
+                    ev.preventDefault();
+                    var src = link.getAttribute('data-src');
+                    var mode = link.getAttribute('data-mode');
+                    if (mode === 'overlay' && src) openOverlay(src);
+                });
+            });
+        })();
+    </script>
+
+</body>
+
+</html>

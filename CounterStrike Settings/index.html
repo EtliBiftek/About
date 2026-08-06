@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CS2 Settings — PIFO</title>
+
+    <!-- ================================================================ -->
+    <!-- FONTS - Fontu değiştirmek için sadece bu bölümü düzenle            -->
+    <!-- ================================================================ -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* === Design Tokens === */
+        :root {
+            --bg: #07070a;
+            --bg-elevated: #0e0e12;
+            --surface: #131318;
+            --surface-hover: #1a1a20;
+            --border: #1e1e26;
+            --border-hover: #2e2e38;
+            --text: #f0f0f5;
+            --text-muted: #6a6a78;
+            --text-dim: #404050;
+            --accent: #b347ff;
+            --accent-2: #ff3b5c;
+            --accent-grad: linear-gradient(135deg, #a855f7, #ff3b5c);
+            --radius-sm: 8px;
+            --radius-md: 14px;
+            --radius-lg: 20px;
+            --radius-full: 9999px;
+            --transition: 200ms cubic-bezier(0.16, 1, 0.3, 1);
+            /* ======================================================== */
+            /* FONT AYARLARI - Fontu değiştirmek için burayı düzenle     */
+            /* ======================================================== */
+            --font-display: 'Comic Sans MS', 'Comic Sans', 'Comic Neue', cursive;
+            --font-body: 'Comic Sans MS', 'Comic Sans', 'Comic Neue', cursive;
+            --font-mono: 'Comic Sans MS', 'Comic Sans', 'Comic Neue', cursive;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100dvh;
+            line-height: 1.6;
+            padding: 24px;
+            opacity: 0;
+            animation: pageFadeIn 0.5s ease forwards;
+        }
+
+        @keyframes pageFadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            body { animation-duration: 0.01ms !important; }
+        }
+
+        ::selection {
+            background: var(--accent);
+            color: #000;
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--border-hover); }
+
+        /* === Background === */
+        .bg-grid {
+            position: fixed;
+            inset: 0;
+            background-image: 
+                linear-gradient(var(--border) 1px, transparent 1px),
+                linear-gradient(90deg, var(--border) 1px, transparent 1px);
+            background-size: 50px 50px;
+            mask-image: radial-gradient(ellipse 80% 60% at 50% 20%, black, transparent);
+            -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 20%, black, transparent);
+            opacity: 0.3;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .bg-glow {
+            position: fixed;
+            top: -15%;
+            left: 30%;
+            width: 600px;
+            height: 400px;
+            background: radial-gradient(ellipse, rgba(168, 85, 247, 0.14), transparent 70%);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .bg-glow-2 {
+            position: fixed;
+            top: -5%;
+            right: -10%;
+            width: 500px;
+            height: 350px;
+            background: radial-gradient(ellipse, rgba(255, 59, 92, 0.10), transparent 70%);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* === Layout === */
+        .page {
+            position: relative;
+            z-index: 1;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* === Header === */
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-top: 20px;
+        }
+
+        .header-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            font-weight: 500;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+        }
+
+        .header-tag::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: var(--accent-grad);
+            border-radius: 50%;
+            box-shadow: 0 0 12px var(--accent);
+        }
+
+        .header h1 {
+            font-family: var(--font-display);
+            font-size: clamp(2rem, 6vw, 3rem);
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 8px;
+        }
+
+        .header h1 .accent {
+            background: var(--accent-grad);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: transparent;
+        }
+
+        .header p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .header p a {
+            color: var(--accent-2);
+            text-decoration: none;
+        }
+
+        .header p a:hover { text-decoration: underline; }
+
+        /* === Crosshair Code Card === */
+        .crosshair-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            margin-bottom: 32px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .crosshair-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--accent-grad);
+        }
+
+        .crosshair-label {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+
+        .crosshair-code {
+            font-family: var(--font-mono);
+            font-size: clamp(0.8rem, 3vw, 1.1rem);
+            color: var(--text);
+            background: var(--bg);
+            padding: 14px 16px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+            word-break: break-all;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .copy-btn {
+            flex-shrink: 0;
+            padding: 6px 16px;
+            background: transparent;
+            border: 1px solid var(--border-hover);
+            border-radius: var(--radius-full);
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            font-weight: 500;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            white-space: nowrap;
+        }
+
+        .copy-btn:hover {
+            background: var(--accent-grad);
+            color: #fff;
+            border-color: transparent;
+        }
+
+        .copy-btn.copied {
+            background: var(--accent-grad);
+            color: #fff;
+            border-color: transparent;
+        }
+
+        /* === Settings Sections === */
+        .section {
+            margin-bottom: 32px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .section-num {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            font-weight: 500;
+            background: var(--accent-grad);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: transparent;
+            letter-spacing: 0.1em;
+        }
+
+        .section-title {
+            font-family: var(--font-display);
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text);
+            letter-spacing: -0.01em;
+        }
+
+        /* === Settings Grid === */
+        .settings-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .setting-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            font-size: 0.88rem;
+            transition: background var(--transition), border-color var(--transition);
+        }
+
+        .setting-row:hover {
+            background: var(--surface-hover);
+            border-color: var(--border-hover);
+        }
+
+        .setting-row.full {
+            grid-column: 1 / -1;
+        }
+
+        .setting-name {
+            color: var(--text-muted);
+            font-size: 0.82rem;
+        }
+
+        .setting-value {
+            color: var(--text);
+            font-family: var(--font-mono);
+            font-size: 0.82rem;
+            font-weight: 700;
+            text-align: right;
+        }
+
+        .setting-value.gradient {
+            background: var(--accent-grad);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: transparent;
+        }
+
+        /* === Launch Options === */
+        .launch-opts {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: var(--text);
+            background: var(--bg);
+            padding: 14px 16px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+            word-break: break-all;
+        }
+
+        /* === Responsive === */
+        @media (max-width: 600px) {
+            body { padding: 16px; }
+            .settings-grid { grid-template-columns: 1fr; }
+            .header { margin-bottom: 28px; }
+            .crosshair-card { padding: 18px; }
+            .crosshair-code {
+                flex-direction: column;
+                align-items: stretch;
+                text-align: center;
+            }
+            .copy-btn { text-align: center; padding: 8px; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg-grid"></div>
+    <div class="bg-glow"></div>
+    <div class="bg-glow-2"></div>
+
+    <div class="page">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-tag">Counter Strike 2</div>
+            <h1>CS2 <span class="accent">Settings</span></h1>
+            <p>Source: <a href="https://settings.gg/player/1529450159" target="_blank">settings.gg</a></p>
+        </header>
+
+        <!-- Crosshair Code -->
+        <div class="crosshair-card">
+            <div class="crosshair-label">Crosshair Code</div>
+            <div class="crosshair-code">
+                <span id="crosshairCode">CSGO-V7KbW-JcOtu-ZTRNK-oOTAE-QSDND</span>
+                <button class="copy-btn" onclick="copyCode()">Copy</button>
+            </div>
+        </div>
+
+        <!-- Mouse Settings -->
+        <section class="section">
+            <div class="section-header">
+                <span class="section-num">01</span>
+                <h2 class="section-title">Mouse</h2>
+            </div>
+            <div class="settings-grid">
+                <div class="setting-row"><span class="setting-name">DPI</span><span class="setting-value gradient">6400</span></div>
+                <div class="setting-row"><span class="setting-name">Sensitivity</span><span class="setting-value gradient">0.22</span></div>
+                <div class="setting-row"><span class="setting-name">eDPI</span><span class="setting-value">1408</span></div>
+                <div class="setting-row"><span class="setting-name">Zoom Sens</span><span class="setting-value">1</span></div>
+                <div class="setting-row"><span class="setting-name">Polling Rate</span><span class="setting-value">1000 Hz</span></div>
+                <div class="setting-row"><span class="setting-name">m_yaw</span><span class="setting-value">0.022</span></div>
+                <div class="setting-row"><span class="setting-name">Windows Sens</span><span class="setting-value">3</span></div>
+            </div>
+        </section>
+
+        <!-- Video Settings -->
+        <section class="section">
+            <div class="section-header">
+                <span class="section-num">02</span>
+                <h2 class="section-title">Video</h2>
+            </div>
+            <div class="settings-grid">
+                <div class="setting-row"><span class="setting-name">Resolution</span><span class="setting-value gradient">1280x960</span></div>
+                <div class="setting-row"><span class="setting-name">Aspect Ratio</span><span class="setting-value gradient">4:3</span></div>
+                <div class="setting-row"><span class="setting-name">Scaling Mode</span><span class="setting-value">Stretched</span></div>
+                <div class="setting-row"><span class="setting-name">Display Mode</span><span class="setting-value">Fullscreen</span></div>
+                <div class="setting-row"><span class="setting-name">Refresh Rate</span><span class="setting-value gradient">240 Hz</span></div>
+                <div class="setting-row"><span class="setting-name">Brightness</span><span class="setting-value">106%</span></div>
+                <div class="setting-row"><span class="setting-name">Boost Player Contrast</span><span class="setting-value">Enabled</span></div>
+                <div class="setting-row"><span class="setting-name">Vertical Sync</span><span class="setting-value">Disabled</span></div>
+                <div class="setting-row"><span class="setting-name">MSAA</span><span class="setting-value">4x MSAA</span></div>
+                <div class="setting-row"><span class="setting-name">Global Shadows</span><span class="setting-value">Low</span></div>
+                <div class="setting-row"><span class="setting-name">Texture/Model Detail</span><span class="setting-value">Very High</span></div>
+                <div class="setting-row"><span class="setting-name">Texture Filtering</span><span class="setting-value">Anisotropic 2X</span></div>
+                <div class="setting-row"><span class="setting-name">Shader Detail</span><span class="setting-value">Low</span></div>
+                <div class="setting-row"><span class="setting-name">Particle Detail</span><span class="setting-value">Low</span></div>
+                <div class="setting-row"><span class="setting-name">Ambient Occlusion</span><span class="setting-value">Disabled</span></div>
+                <div class="setting-row"><span class="setting-name">HDR</span><span class="setting-value">Quality</span></div>
+                <div class="setting-row"><span class="setting-name">FSR</span><span class="setting-value">Disabled</span></div>
+                <div class="setting-row"><span class="setting-name">NVIDIA Reflex</span><span class="setting-value gradient">Enabled + Boost</span></div>
+            </div>
+        </section>
+
+        <!-- Viewmodel -->
+        <section class="section">
+            <div class="section-header">
+                <span class="section-num">03</span>
+                <h2 class="section-title">Viewmodel</h2>
+            </div>
+            <div class="settings-grid">
+                <div class="setting-row"><span class="setting-name">viewmodel_fov</span><span class="setting-value gradient">68</span></div>
+                <div class="setting-row"><span class="setting-name">viewmodel_offset_x</span><span class="setting-value">2.5</span></div>
+                <div class="setting-row"><span class="setting-name">viewmodel_offset_y</span><span class="setting-value">-2</span></div>
+                <div class="setting-row"><span class="setting-name">viewmodel_offset_z</span><span class="setting-value">-2</span></div>
+            </div>
+        </section>
+
+        <!-- HUD -->
+        <section class="section">
+            <div class="section-header">
+                <span class="section-num">04</span>
+                <h2 class="section-title">HUD</h2>
+            </div>
+            <div class="settings-grid">
+                <div class="setting-row"><span class="setting-name">hud_scaling</span><span class="setting-value">0.85</span></div>
+                <div class="setting-row"><span class="setting-name">cl_hud_color</span><span class="setting-value">6</span></div>
+                <div class="setting-row"><span class="setting-name">cl_showloadout</span><span class="setting-value">true</span></div>
+                <div class="setting-row"><span class="setting-name">safezonex</span><span class="setting-value">0.97</span></div>
+                <div class="setting-row"><span class="setting-name">safezoney</span><span class="setting-value">0.939</span></div>
+            </div>
+        </section>
+
+        <!-- Radar -->
+        <section class="section">
+            <div class="section-header">
+                <span class="section-num">05</span>
+                <h2 class="section-title">Radar</h2>
+            </div>
+            <div class="settings-grid">
+                <div class="setting-row"><span class="setting-name">cl_hud_radar_scale</span><span class="setting-value">1.3</span></div>
+                <div class="setting-row"><span class="setting-name">cl_radar_scale</span><span class="setting-value">0.35</span></div>
+                <div class="setting-row"><span class="setting-name">cl_radar_rotate</span><span class="setting-value">true</span></div>
+                <div class="setting-row"><span class="setting-name">cl_radar_icon_scale_min</span><span class="setting-value">0.6</span></div>
+            </div>
+        </section>
+
+        <!-- NVIDIA Settings -->
+        <section class="section">
+            <div class="section-header">
+                <span class="section-num">06</span>
+                <h2 class="section-title">NVIDIA</h2>
+            </div>
+            <div class="settings-grid">
+                <div class="setting-row"><span class="setting-name">Contrast</span><span class="setting-value">105</span></div>
+                <div class="setting-row"><span class="setting-name">Gamma</span><span class="setting-value">1.1</span></div>
+                <div class="setting-row"><span class="setting-name">Digital Vibrance</span><span class="setting-value gradient">90</span></div>
+            </div>
+        </section>
+
+        <!-- Launch Options -->
+        <section class="section">
+            <div class="section-header">
+                <span class="section-num">07</span>
+                <h2 class="section-title">Launch Options</h2>
+            </div>
+            <div class="launch-opts">-console -nojoy -threads 7 -mainthreadpriority 2 +fps_max 0</div>
+        </section>
+    </div>
+
+    <script>
+        function copyCode() {
+            var code = document.getElementById('crosshairCode').textContent;
+            var btn = document.querySelector('.copy-btn');
+            
+            function showCopied() {
+                btn.textContent = 'Copied!';
+                btn.classList.add('copied');
+                setTimeout(function() {
+                    btn.textContent = 'Copy';
+                    btn.classList.remove('copied');
+                }, 2000);
+            }
+
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(code).then(showCopied).catch(function() {
+                    fallbackCopy(code);
+                    showCopied();
+                });
+            } else {
+                fallbackCopy(code);
+                showCopied();
+            }
+        }
+
+        function fallbackCopy(text) {
+            var ta = document.createElement('textarea');
+            ta.value = text;
+            ta.style.position = 'fixed';
+            ta.style.opacity = '0';
+            document.body.appendChild(ta);
+            ta.select();
+            try { document.execCommand('copy'); } catch(e) {}
+            document.body.removeChild(ta);
+        }
+    </script>
+<script data-pplx-inline-edit>
+(function () {
+  if (window === window.top) return;
+
+  const allowedParentOrigins = ["https://www.perplexity.ai","https://perplexity.ai","https://testing.perplexity.ai","https://staging.perplexity.ai","https://*.preview.i.perplexity.ai","http://perplexity.localhost","http://localhost:1420","http://127.0.0.1:1420","http://localhost:3000","http://127.0.0.1:3000","http://localhost:5173","http://127.0.0.1:5173"];
+  const MAX_FONT_BYTES = 500 * 1024;
+  const MAX_TOTAL_FONT_BYTES = 2 * 1024 * 1024;
+  let scrollForwarding = false;
+  let scrollRaf = 0;
+  let trustedTopOrigin = null;
+
+  // Allow entries like "https://*.preview.i.perplexity.ai" — the wildcard
+  // matches a single DNS label (no dots), so "https://*.foo" cannot stretch
+  // across multiple labels.
+  function matchesAllowedOrigin(origin) {
+    if (!origin) return false;
+    for (const entry of allowedParentOrigins) {
+      if (!entry.includes("*")) {
+        if (entry === origin) return true;
+        continue;
+      }
+      const pattern = new RegExp(
+        "^" +
+          entry.replace(/[.+?^${}()|[\]\\]/g, "\\$&").replace(/\*/g, "[^.]+") +
+          "$",
+      );
+      if (pattern.test(origin)) return true;
+    }
+    return false;
+  }
+
+  // Trust decision: when the sender is same-origin-visible (event.origin is a
+  // real origin like https://www.perplexity.ai) we trust event.origin directly.
+  // When event.origin is "null" (opaque broker srcdoc), we fall back to the
+  // broker's stamped `parentOrigin` to identify the top window. The fallback
+  // is claim-only — we rely on the browser's native `targetOrigin` enforcement
+  // on the response path (see postToTrustedTop) to ensure replies can't be
+  // delivered to anyone but the actual top window of that claimed origin.
+  function getTrustedParentOrigin(event) {
+    const forwardedParentOrigin =
+      typeof event.data.parentOrigin === "string" ? event.data.parentOrigin : null;
+    const parentOrigin = event.origin === "null" ? forwardedParentOrigin : event.origin;
+    return matchesAllowedOrigin(parentOrigin) ? parentOrigin : null;
+  }
+
+  // All responses go to window.top with targetOrigin = the allowlisted origin.
+  // An attacker that iframes us inside their own null-origin broker can claim
+  // any parentOrigin they like, but the browser will drop the reply whenever
+  // the real top's origin doesn't match — so the screenshot never leaves.
+  function postToTrustedTop(message) {
+    if (!trustedTopOrigin) return;
+    try {
+      window.top.postMessage(message, trustedTopOrigin);
+    } catch (_error) {}
+  }
+
+  function inlineAll(original, clone) {
+    if (original.nodeType !== 1 || clone.nodeType !== 1) return;
+
+    try {
+      const computedStyle = getComputedStyle(original);
+      // cssText on a computed style is the serialized declaration in modern
+      // Chromium/Safari — a single read beats enumerating ~400 longhand
+      // properties. Firefox returns "" here, so we fall back on empty.
+      const serialized = computedStyle.cssText;
+      if (serialized) {
+        clone.style.cssText = serialized;
+      } else {
+        const parts = new Array(computedStyle.length);
+        for (let index = 0; index < computedStyle.length; index += 1) {
+          const property = computedStyle[index];
+          parts[index] = `${property}:${computedStyle.getPropertyValue(property)};`;
+        }
+        clone.style.cssText = parts.join("");
+      }
+    } catch (_error) {}
+
+    const originalChildren = original.children;
+    const clonedChildren = clone.children;
+    for (
+      let index = 0;
+      index < originalChildren.length && index < clonedChildren.length;
+      index += 1
+    ) {
+      inlineAll(originalChildren[index], clonedChildren[index]);
+    }
+  }
+
+  function extractFontUrl(srcValue) {
+    const matches = [
+      ...srcValue.matchAll(
+        /url\(["']?([^"')]+)["']?\)(?:\s*format\(["']?([^"')]+)["']?\))?/gi,
+      ),
+    ];
+    if (matches.length === 0) return null;
+    const woff2 = matches.find((m) => m[2] && m[2].toLowerCase().includes("woff2"));
+    if (woff2) return woff2[1];
+    const woff = matches.find((m) => m[2] && m[2].toLowerCase().includes("woff"));
+    if (woff) return woff[1];
+    return matches[0][1];
+  }
+
+  // Cache resolved font URL -> data URI across captures. Fonts on a page
+  // essentially never change, and a batch run emits multiple captures back to
+  // back — without this we'd refetch + re-base64 every time.
+  const fontDataUriCache = new Map();
+  const SRC_DECLARATION_RE = /src\s*:\s*[^;}]+/i;
+
+  async function fetchAsDataUri(url) {
+    if (fontDataUriCache.has(url)) return fontDataUriCache.get(url);
+    let dataUri = null;
+    try {
+      const response = await fetch(url, { mode: "cors", credentials: "omit" });
+      if (response.ok) {
+        const blob = await response.blob();
+        if (blob.size <= MAX_FONT_BYTES) {
+          dataUri = await new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onloadend = () =>
+              resolve(typeof reader.result === "string" ? reader.result : null);
+            reader.onerror = () => resolve(null);
+            reader.readAsDataURL(blob);
+          });
+        }
+      }
+    } catch (_error) {
+      dataUri = null;
+    }
+    fontDataUriCache.set(url, dataUri);
+    return dataUri;
+  }
+
+  function collectFontFaceRuleTexts() {
+    const rules = [];
+    for (const sheet of document.styleSheets) {
+      let cssRules;
+      try {
+        cssRules = sheet.cssRules;
+      } catch (_error) {
+        continue;
+      }
+      if (!cssRules) continue;
+      for (const rule of cssRules) {
+        const cssText = rule.cssText || "";
+        if (cssText.startsWith("@font-face")) rules.push(cssText);
+      }
+    }
+    return rules;
+  }
+
+  async function buildInlinedFontCss() {
+    const ruleTexts = collectFontFaceRuleTexts();
+    if (ruleTexts.length === 0) return null;
+
+    const resolved = ruleTexts.map((cssText) => {
+      if (!SRC_DECLARATION_RE.test(cssText)) return null;
+      const srcMatch = cssText.match(/src\s*:\s*([^;}]+)[;}]/i);
+      if (!srcMatch) return null;
+      const url = extractFontUrl(srcMatch[1]);
+      if (!url) return null;
+      try {
+        return { cssText, url: new URL(url, document.baseURI).href };
+      } catch (_error) {
+        return null;
+      }
+    });
+
+    const dataUris = await Promise.all(
+      resolved.map((entry) => (entry ? fetchAsDataUri(entry.url) : Promise.resolve(null))),
+    );
+
+    const inlined = [];
+    let totalBytes = 0;
+    for (let index = 0; index < resolved.length; index += 1) {
+      const entry = resolved[index];
+      const dataUri = dataUris[index];
+      if (!entry || !dataUri) continue;
+      const approxBytes = dataUri.length * 0.75;
+      if (totalBytes + approxBytes > MAX_TOTAL_FONT_BYTES) break;
+      totalBytes += approxBytes;
+      inlined.push(entry.cssText.replace(SRC_DECLARATION_RE, `src: url("${dataUri}")`));
+    }
+    return inlined.length > 0 ? inlined.join("\n") : null;
+  }
+
+  function stripExternal(clone) {
+    const images = clone.querySelectorAll("img");
+    for (let index = 0; index < images.length; index += 1) {
+      const src = images[index].getAttribute("src");
+      if (src && !src.startsWith("data:")) images[index].removeAttribute("src");
+    }
+
+    const elements = clone.querySelectorAll("*");
+    for (let index = 0; index < elements.length; index += 1) {
+      const style = elements[index].style.cssText;
+      if (style && style.includes("url(")) {
+        elements[index].style.cssText = style.replace(
+          /url\(["']?(?!data:)[^)"']*["']?\)/gi,
+          "none",
+        );
+      }
+    }
+  }
+
+  function emitScroll() {
+    scrollRaf = 0;
+    if (!scrollForwarding) return;
+    postToTrustedTop({
+      type: "INLINE_EDIT_SCROLL",
+      scrollX: window.scrollX,
+      scrollY: window.scrollY,
+    });
+  }
+
+  window.addEventListener(
+    "scroll",
+    function () {
+      if (!scrollForwarding || scrollRaf) return;
+      scrollRaf = requestAnimationFrame(emitScroll);
+    },
+    { passive: true, capture: true },
+  );
+
+  async function handleCaptureRequest(event) {
+    const requestId = event.data.requestId;
+    const scrollX = window.scrollX;
+    const scrollY = window.scrollY;
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+
+    function postResult(dataUrl) {
+      postToTrustedTop({
+        type: "INLINE_EDIT_SCREENSHOT_RESULT",
+        requestId,
+        dataUrl,
+        scrollX,
+        scrollY,
+      });
+    }
+
+    try {
+      // Wait for any pending web fonts to resolve so both inline metrics and
+      // the @font-face inlining below see the same loaded faces.
+      if (document.fonts && document.fonts.ready) {
+        try {
+          await document.fonts.ready;
+        } catch (_error) {}
+      }
+
+      const clone = document.documentElement.cloneNode(true);
+      inlineAll(document.documentElement, clone);
+
+      const removedNodes = clone.querySelectorAll("script,link[rel=\"stylesheet\"],style");
+      for (let index = 0; index < removedNodes.length; index += 1) {
+        removedNodes[index].remove();
+      }
+
+      stripExternal(clone);
+
+      // Re-embed web fonts as data-URI @font-face rules so the SVG rasterizer
+      // can resolve them — external font URLs aren't fetched during
+      // foreignObject rendering, which would otherwise force a fallback face
+      // and change text metrics.
+      const inlinedFontCss = await buildInlinedFontCss();
+      if (inlinedFontCss) {
+        const styleEl = document.createElement("style");
+        styleEl.textContent = inlinedFontCss;
+        const head = clone.querySelector("head");
+        if (head) head.appendChild(styleEl);
+        else clone.insertBefore(styleEl, clone.firstChild);
+      }
+
+      const html = new XMLSerializer().serializeToString(clone);
+      const svg =
+        `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">` +
+        '<foreignObject width="100%" height="100%">' +
+        `<div xmlns="http://www.w3.org/1999/xhtml" style="width:${width}px;height:${height}px;overflow:hidden">` +
+        `<div style="position:relative;left:-${scrollX}px;top:-${scrollY}px">` +
+        html +
+        "</div></div></foreignObject></svg>";
+      const svgUrl = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+      const image = new Image();
+      image.onload = function () {
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        canvas.getContext("2d").drawImage(image, 0, 0);
+        postResult(canvas.toDataURL("image/png"));
+      };
+      image.onerror = function () {
+        postResult(null);
+      };
+      image.src = svgUrl;
+    } catch (_error) {
+      postResult(null);
+    }
+  }
+
+  window.addEventListener("message", function (event) {
+    if (!event.data) return;
+    // Only accept messages from the direct parent frame. Blocks sibling /
+    // unrelated-window postMessage senders that could otherwise reach us.
+    if (event.source !== window.parent) return;
+
+    const trustedParentOrigin = getTrustedParentOrigin(event);
+    if (!trustedParentOrigin) return;
+    trustedTopOrigin = trustedParentOrigin;
+
+    if (event.data.type === "INLINE_EDIT_SCROLL_START") {
+      scrollForwarding = true;
+      emitScroll();
+      return;
+    }
+
+    if (event.data.type === "INLINE_EDIT_SCROLL_STOP") {
+      scrollForwarding = false;
+      if (scrollRaf) cancelAnimationFrame(scrollRaf);
+      scrollRaf = 0;
+      return;
+    }
+
+    if (event.data.type !== "INLINE_EDIT_CAPTURE_REQUEST") return;
+
+    handleCaptureRequest(event);
+  });
+})();
+
+
+</script></body>
+
+</html>

@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>My Computer Parts — PIFO</title>
+
+    <!-- ================================================================ -->
+    <!-- FONTS - Fontu değiştirmek için sadece bu bölümü düzenle            -->
+    <!-- ================================================================ -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg: #07070a;
+            --bg-elevated: #0e0e12;
+            --surface: #131318;
+            --surface-hover: #1a1a20;
+            --border: #1e1e26;
+            --border-hover: #2e2e38;
+            --text: #f0f0f5;
+            --text-muted: #6a6a78;
+            --text-dim: #404050;
+            --accent: #b347ff;
+            --accent-2: #ff3b5c;
+            --accent-grad: linear-gradient(135deg, #a855f7, #ff3b5c);
+            --radius-sm: 8px;
+            --radius-md: 14px;
+            --radius-lg: 20px;
+            --radius-full: 9999px;
+            --transition: 200ms cubic-bezier(0.16, 1, 0.3, 1);
+            --font-display: 'Comic Sans MS', 'Comic Sans', 'Comic Neue', cursive;
+            --font-body: 'Comic Sans MS', 'Comic Sans', 'Comic Neue', cursive;
+            --font-mono: 'Comic Sans MS', 'Comic Sans', 'Comic Neue', cursive;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; scroll-behavior: smooth; }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100dvh;
+            line-height: 1.6;
+            padding: 24px;
+            opacity: 0;
+            animation: pageFadeIn 0.5s ease forwards;
+        }
+
+        @keyframes pageFadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            body { animation-duration: 0.01ms !important; }
+        }
+
+        ::selection { background: var(--accent); color: #000; }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+        .bg-grid {
+            position: fixed; inset: 0;
+            background-image:
+                linear-gradient(var(--border) 1px, transparent 1px),
+                linear-gradient(90deg, var(--border) 1px, transparent 1px);
+            background-size: 50px 50px;
+            mask-image: radial-gradient(ellipse 80% 60% at 50% 20%, black, transparent);
+            -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 20%, black, transparent);
+            opacity: 0.3; z-index: 0; pointer-events: none;
+        }
+
+        .bg-glow {
+            position: fixed; top: -15%; left: 30%;
+            width: 600px; height: 400px;
+            background: radial-gradient(ellipse, rgba(168, 85, 247, 0.14), transparent 70%);
+            z-index: 0; pointer-events: none;
+        }
+
+        .bg-glow-2 {
+            position: fixed; top: -5%; right: -10%;
+            width: 500px; height: 350px;
+            background: radial-gradient(ellipse, rgba(255, 59, 92, 0.10), transparent 70%);
+            z-index: 0; pointer-events: none;
+        }
+
+        .page { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; }
+
+        .header { text-align: center; margin-bottom: 40px; padding-top: 20px; }
+
+        .header-tag {
+            display: inline-flex; align-items: center; gap: 8px;
+            font-family: var(--font-mono); font-size: 0.72rem; font-weight: 500;
+            letter-spacing: 0.12em; text-transform: uppercase;
+            color: var(--text-muted); margin-bottom: 16px;
+        }
+
+        .header-tag::before {
+            content: ''; width: 8px; height: 8px;
+            background: var(--accent-grad); border-radius: 50%;
+            box-shadow: 0 0 12px var(--accent);
+        }
+
+        .header h1 {
+            font-family: var(--font-display);
+            font-size: clamp(2rem, 6vw, 3rem); font-weight: 700;
+            letter-spacing: -0.02em; margin-bottom: 8px;
+        }
+
+        .header h1 .accent {
+            background: var(--accent-grad);
+            -webkit-background-clip: text; background-clip: text;
+            -webkit-text-fill-color: transparent; color: transparent;
+        }
+
+        .header p { color: var(--text-muted); font-size: 0.9rem; }
+
+        /* === Parts Grid === */
+        .parts-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .part-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            text-decoration: none;
+            color: var(--text);
+            transition: transform var(--transition), border-color var(--transition), box-shadow var(--transition);
+            position: relative;
+        }
+
+        .part-card:hover {
+            transform: translateY(-6px);
+            border-color: var(--border-hover);
+            box-shadow: 0 12px 40px rgba(168, 85, 247, 0.1);
+        }
+
+        .part-card::before {
+            content: '';
+            position: absolute; top: 0; left: 0; right: 0;
+            height: 2px;
+            background: var(--accent-grad);
+            transform: scaleX(0);
+            transition: transform var(--transition);
+            transform-origin: left;
+        }
+
+        .part-card:hover::before { transform: scaleX(1); }
+
+        .part-img-wrap {
+            width: 100%; height: 180px;
+            background: radial-gradient(ellipse at center, rgba(168, 85, 247, 0.06), transparent 70%), var(--bg);
+            display: flex; align-items: center; justify-content: center;
+            overflow: hidden;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .part-img-wrap img {
+            max-width: 90%; max-height: 90%;
+            object-fit: contain;
+            transition: transform var(--transition);
+        }
+
+        .part-card:hover .part-img-wrap img { transform: scale(1.08); }
+
+        .part-info { padding: 18px 20px; }
+
+        .part-category {
+            font-family: var(--font-mono); font-size: 0.68rem;
+            font-weight: 500; text-transform: uppercase;
+            letter-spacing: 0.1em;
+            background: var(--accent-grad);
+            -webkit-background-clip: text; background-clip: text;
+            -webkit-text-fill-color: transparent; color: transparent;
+            margin-bottom: 6px;
+        }
+
+        .part-name {
+            font-size: 0.92rem; font-weight: 700;
+            color: var(--text); line-height: 1.4;
+            margin-bottom: 8px;
+        }
+
+        .part-link {
+            display: inline-flex; align-items: center; gap: 6px;
+            font-size: 0.78rem; color: var(--text-muted);
+            transition: color var(--transition);
+        }
+
+        .part-card:hover .part-link { color: var(--accent-2); }
+
+        .part-link svg { width: 12px; height: 12px; transition: transform var(--transition); }
+        .part-card:hover .part-link svg { transform: translateX(3px); }
+
+        @media (max-width: 600px) {
+            body { padding: 16px; }
+            .parts-grid { grid-template-columns: 1fr; gap: 16px; }
+            .header { margin-bottom: 28px; }
+            .part-img-wrap { height: 150px; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg-grid"></div>
+    <div class="bg-glow"></div>
+    <div class="bg-glow-2"></div>
+
+    <div class="page">
+        <header class="header">
+            <div class="header-tag">My Build</div>
+            <h1>My Computer <span class="accent">Parts</span></h1>
+            <p>Bilesenlere tiklayarak Amazon'daki sayfalarina gidebilirsiniz</p>
+        </header>
+
+        <div class="parts-grid">
+            <!-- GPU -->
+            <a class="part-card" href="https://www.amazon.de/Gigabyte-GeForce-3070-Gaming-Grafikkarte/dp/B08KHL21CV" target="_blank">
+                <div class="part-img-wrap"><img src="img/gpu.png" alt="Gigabyte GeForce RTX 3070 Gaming OC 8G"></div>
+                <div class="part-info">
+                    <div class="part-category">GPU</div>
+                    <div class="part-name">Gigabyte GeForce RTX 3070 Gaming OC 8G</div>
+                    <span class="part-link">Amazon'da incele
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </span>
+                </div>
+            </a>
+
+            <!-- CPU -->
+            <a class="part-card" href="https://www.amazon.com/AMD-5600-12-Thread-Unlocked-Processor/dp/B09VCHR1VH" target="_blank">
+                <div class="part-img-wrap"><img src="img/cpu.png" alt="AMD Ryzen 5 5600"></div>
+                <div class="part-info">
+                    <div class="part-category">CPU</div>
+                    <div class="part-name">AMD Ryzen 5 5600</div>
+                    <span class="part-link">Amazon'da incele
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </span>
+                </div>
+            </a>
+
+            <!-- Motherboard -->
+            <a class="part-card" href="https://www.amazon.co.uk/Gigabyte-B550-GAMING-V2-Motherboard/dp/B08K16S4K1" target="_blank">
+                <div class="part-img-wrap"><img src="img/motherboard.png" alt="Gigabyte B550 Gaming X V2"></div>
+                <div class="part-info">
+                    <div class="part-category">Anakart</div>
+                    <div class="part-name">Gigabyte B550 Gaming X V2</div>
+                    <span class="part-link">Amazon'da incele
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </span>
+                </div>
+            </a>
+
+            <!-- RAM -->
+            <a class="part-card" href="https://www.amazon.com/Lexar-3200MT-Desktop-Heatsink-LD4U08G32C16LG-RUD/dp/B0CGR5WY8R" target="_blank">
+                <div class="part-img-wrap"><img src="img/ram.png" alt="Lexar Thor 16GB 3200MHz DDR4"></div>
+                <div class="part-info">
+                    <div class="part-category">RAM</div>
+                    <div class="part-name">Lexar Thor 16GB (2x8GB) 3200MHz DDR4</div>
+                    <span class="part-link">Amazon'da incele
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </span>
+                </div>
+            </a>
+
+            <!-- M.2 SSD 1 -->
+            <a class="part-card" href="https://www.amazon.co.uk/goodram-PX600-1000GB-PCIe-2280/dp/B0CB1QBGXW" target="_blank">
+                <div class="part-img-wrap"><img src="img/ssd.png" alt="Goodram PX600 1TB M.2 SSD"></div>
+                <div class="part-info">
+                    <div class="part-category">M.2 SSD 1</div>
+                    <div class="part-name">Goodram PX600 1TB NVMe M.2 SSD</div>
+                    <span class="part-link">Amazon'da incele
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </span>
+                </div>
+            </a>
+
+            <!-- M.2 SSD 2 -->
+            <a class="part-card" href="https://www.amazon.co.uk/goodram-PX600-1000GB-PCIe-2280/dp/B0CB1QBGXW" target="_blank">
+                <div class="part-img-wrap"><img src="img/ssd.png" alt="Goodram PX600 1TB M.2 SSD"></div>
+                <div class="part-info">
+                    <div class="part-category">M.2 SSD 2</div>
+                    <div class="part-name">Goodram PX600 1TB NVMe M.2 SSD</div>
+                    <span class="part-link">Amazon'da incele
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </span>
+                </div>
+            </a>
+
+            <!-- CPU Cooler -->
+            <a class="part-card" href="https://www.amazon.com/s?k=Thermalright+Assassin+X+120+R+Digital+ARGB" target="_blank">
+                <div class="part-img-wrap"><img src="img/cooler.png" alt="Thermalright Assassin X 120 R Digital ARGB"></div>
+                <div class="part-info">
+                    <div class="part-category">Islemci Sogutucu</div>
+                    <div class="part-name">Thermalright Assassin X 120 R Digital ARGB</div>
+                    <span class="part-link">Amazon'da incele
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </span>
+                </div>
+            </a>
+        </div>
+    </div>
+<script data-pplx-inline-edit>
+(function () {
+  if (window === window.top) return;
+
+  const allowedParentOrigins = ["https://www.perplexity.ai","https://perplexity.ai","https://testing.perplexity.ai","https://staging.perplexity.ai","https://*.preview.i.perplexity.ai","http://perplexity.localhost","http://localhost:1420","http://127.0.0.1:1420","http://localhost:3000","http://127.0.0.1:3000","http://localhost:5173","http://127.0.0.1:5173"];
+  const MAX_FONT_BYTES = 500 * 1024;
+  const MAX_TOTAL_FONT_BYTES = 2 * 1024 * 1024;
+  let scrollForwarding = false;
+  let scrollRaf = 0;
+  let trustedTopOrigin = null;
+
+  // Allow entries like "https://*.preview.i.perplexity.ai" — the wildcard
+  // matches a single DNS label (no dots), so "https://*.foo" cannot stretch
+  // across multiple labels.
+  function matchesAllowedOrigin(origin) {
+    if (!origin) return false;
+    for (const entry of allowedParentOrigins) {
+      if (!entry.includes("*")) {
+        if (entry === origin) return true;
+        continue;
+      }
+      const pattern = new RegExp(
+        "^" +
+          entry.replace(/[.+?^${}()|[\]\\]/g, "\\$&").replace(/\*/g, "[^.]+") +
+          "$",
+      );
+      if (pattern.test(origin)) return true;
+    }
+    return false;
+  }
+
+  // Trust decision: when the sender is same-origin-visible (event.origin is a
+  // real origin like https://www.perplexity.ai) we trust event.origin directly.
+  // When event.origin is "null" (opaque broker srcdoc), we fall back to the
+  // broker's stamped `parentOrigin` to identify the top window. The fallback
+  // is claim-only — we rely on the browser's native `targetOrigin` enforcement
+  // on the response path (see postToTrustedTop) to ensure replies can't be
+  // delivered to anyone but the actual top window of that claimed origin.
+  function getTrustedParentOrigin(event) {
+    const forwardedParentOrigin =
+      typeof event.data.parentOrigin === "string" ? event.data.parentOrigin : null;
+    const parentOrigin = event.origin === "null" ? forwardedParentOrigin : event.origin;
+    return matchesAllowedOrigin(parentOrigin) ? parentOrigin : null;
+  }
+
+  // All responses go to window.top with targetOrigin = the allowlisted origin.
+  // An attacker that iframes us inside their own null-origin broker can claim
+  // any parentOrigin they like, but the browser will drop the reply whenever
+  // the real top's origin doesn't match — so the screenshot never leaves.
+  function postToTrustedTop(message) {
+    if (!trustedTopOrigin) return;
+    try {
+      window.top.postMessage(message, trustedTopOrigin);
+    } catch (_error) {}
+  }
+
+  function inlineAll(original, clone) {
+    if (original.nodeType !== 1 || clone.nodeType !== 1) return;
+
+    try {
+      const computedStyle = getComputedStyle(original);
+      // cssText on a computed style is the serialized declaration in modern
+      // Chromium/Safari — a single read beats enumerating ~400 longhand
+      // properties. Firefox returns "" here, so we fall back on empty.
+      const serialized = computedStyle.cssText;
+      if (serialized) {
+        clone.style.cssText = serialized;
+      } else {
+        const parts = new Array(computedStyle.length);
+        for (let index = 0; index < computedStyle.length; index += 1) {
+          const property = computedStyle[index];
+          parts[index] = `${property}:${computedStyle.getPropertyValue(property)};`;
+        }
+        clone.style.cssText = parts.join("");
+      }
+    } catch (_error) {}
+
+    const originalChildren = original.children;
+    const clonedChildren = clone.children;
+    for (
+      let index = 0;
+      index < originalChildren.length && index < clonedChildren.length;
+      index += 1
+    ) {
+      inlineAll(originalChildren[index], clonedChildren[index]);
+    }
+  }
+
+  function extractFontUrl(srcValue) {
+    const matches = [
+      ...srcValue.matchAll(
+        /url\(["']?([^"')]+)["']?\)(?:\s*format\(["']?([^"')]+)["']?\))?/gi,
+      ),
+    ];
+    if (matches.length === 0) return null;
+    const woff2 = matches.find((m) => m[2] && m[2].toLowerCase().includes("woff2"));
+    if (woff2) return woff2[1];
+    const woff = matches.find((m) => m[2] && m[2].toLowerCase().includes("woff"));
+    if (woff) return woff[1];
+    return matches[0][1];
+  }
+
+  // Cache resolved font URL -> data URI across captures. Fonts on a page
+  // essentially never change, and a batch run emits multiple captures back to
+  // back — without this we'd refetch + re-base64 every time.
+  const fontDataUriCache = new Map();
+  const SRC_DECLARATION_RE = /src\s*:\s*[^;}]+/i;
+
+  async function fetchAsDataUri(url) {
+    if (fontDataUriCache.has(url)) return fontDataUriCache.get(url);
+    let dataUri = null;
+    try {
+      const response = await fetch(url, { mode: "cors", credentials: "omit" });
+      if (response.ok) {
+        const blob = await response.blob();
+        if (blob.size <= MAX_FONT_BYTES) {
+          dataUri = await new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onloadend = () =>
+              resolve(typeof reader.result === "string" ? reader.result : null);
+            reader.onerror = () => resolve(null);
+            reader.readAsDataURL(blob);
+          });
+        }
+      }
+    } catch (_error) {
+      dataUri = null;
+    }
+    fontDataUriCache.set(url, dataUri);
+    return dataUri;
+  }
+
+  function collectFontFaceRuleTexts() {
+    const rules = [];
+    for (const sheet of document.styleSheets) {
+      let cssRules;
+      try {
+        cssRules = sheet.cssRules;
+      } catch (_error) {
+        continue;
+      }
+      if (!cssRules) continue;
+      for (const rule of cssRules) {
+        const cssText = rule.cssText || "";
+        if (cssText.startsWith("@font-face")) rules.push(cssText);
+      }
+    }
+    return rules;
+  }
+
+  async function buildInlinedFontCss() {
+    const ruleTexts = collectFontFaceRuleTexts();
+    if (ruleTexts.length === 0) return null;
+
+    const resolved = ruleTexts.map((cssText) => {
+      if (!SRC_DECLARATION_RE.test(cssText)) return null;
+      const srcMatch = cssText.match(/src\s*:\s*([^;}]+)[;}]/i);
+      if (!srcMatch) return null;
+      const url = extractFontUrl(srcMatch[1]);
+      if (!url) return null;
+      try {
+        return { cssText, url: new URL(url, document.baseURI).href };
+      } catch (_error) {
+        return null;
+      }
+    });
+
+    const dataUris = await Promise.all(
+      resolved.map((entry) => (entry ? fetchAsDataUri(entry.url) : Promise.resolve(null))),
+    );
+
+    const inlined = [];
+    let totalBytes = 0;
+    for (let index = 0; index < resolved.length; index += 1) {
+      const entry = resolved[index];
+      const dataUri = dataUris[index];
+      if (!entry || !dataUri) continue;
+      const approxBytes = dataUri.length * 0.75;
+      if (totalBytes + approxBytes > MAX_TOTAL_FONT_BYTES) break;
+      totalBytes += approxBytes;
+      inlined.push(entry.cssText.replace(SRC_DECLARATION_RE, `src: url("${dataUri}")`));
+    }
+    return inlined.length > 0 ? inlined.join("\n") : null;
+  }
+
+  function stripExternal(clone) {
+    const images = clone.querySelectorAll("img");
+    for (let index = 0; index < images.length; index += 1) {
+      const src = images[index].getAttribute("src");
+      if (src && !src.startsWith("data:")) images[index].removeAttribute("src");
+    }
+
+    const elements = clone.querySelectorAll("*");
+    for (let index = 0; index < elements.length; index += 1) {
+      const style = elements[index].style.cssText;
+      if (style && style.includes("url(")) {
+        elements[index].style.cssText = style.replace(
+          /url\(["']?(?!data:)[^)"']*["']?\)/gi,
+          "none",
+        );
+      }
+    }
+  }
+
+  function emitScroll() {
+    scrollRaf = 0;
+    if (!scrollForwarding) return;
+    postToTrustedTop({
+      type: "INLINE_EDIT_SCROLL",
+      scrollX: window.scrollX,
+      scrollY: window.scrollY,
+    });
+  }
+
+  window.addEventListener(
+    "scroll",
+    function () {
+      if (!scrollForwarding || scrollRaf) return;
+      scrollRaf = requestAnimationFrame(emitScroll);
+    },
+    { passive: true, capture: true },
+  );
+
+  async function handleCaptureRequest(event) {
+    const requestId = event.data.requestId;
+    const scrollX = window.scrollX;
+    const scrollY = window.scrollY;
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+
+    function postResult(dataUrl) {
+      postToTrustedTop({
+        type: "INLINE_EDIT_SCREENSHOT_RESULT",
+        requestId,
+        dataUrl,
+        scrollX,
+        scrollY,
+      });
+    }
+
+    try {
+      // Wait for any pending web fonts to resolve so both inline metrics and
+      // the @font-face inlining below see the same loaded faces.
+      if (document.fonts && document.fonts.ready) {
+        try {
+          await document.fonts.ready;
+        } catch (_error) {}
+      }
+
+      const clone = document.documentElement.cloneNode(true);
+      inlineAll(document.documentElement, clone);
+
+      const removedNodes = clone.querySelectorAll("script,link[rel=\"stylesheet\"],style");
+      for (let index = 0; index < removedNodes.length; index += 1) {
+        removedNodes[index].remove();
+      }
+
+      stripExternal(clone);
+
+      // Re-embed web fonts as data-URI @font-face rules so the SVG rasterizer
+      // can resolve them — external font URLs aren't fetched during
+      // foreignObject rendering, which would otherwise force a fallback face
+      // and change text metrics.
+      const inlinedFontCss = await buildInlinedFontCss();
+      if (inlinedFontCss) {
+        const styleEl = document.createElement("style");
+        styleEl.textContent = inlinedFontCss;
+        const head = clone.querySelector("head");
+        if (head) head.appendChild(styleEl);
+        else clone.insertBefore(styleEl, clone.firstChild);
+      }
+
+      const html = new XMLSerializer().serializeToString(clone);
+      const svg =
+        `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">` +
+        '<foreignObject width="100%" height="100%">' +
+        `<div xmlns="http://www.w3.org/1999/xhtml" style="width:${width}px;height:${height}px;overflow:hidden">` +
+        `<div style="position:relative;left:-${scrollX}px;top:-${scrollY}px">` +
+        html +
+        "</div></div></foreignObject></svg>";
+      const svgUrl = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+      const image = new Image();
+      image.onload = function () {
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        canvas.getContext("2d").drawImage(image, 0, 0);
+        postResult(canvas.toDataURL("image/png"));
+      };
+      image.onerror = function () {
+        postResult(null);
+      };
+      image.src = svgUrl;
+    } catch (_error) {
+      postResult(null);
+    }
+  }
+
+  window.addEventListener("message", function (event) {
+    if (!event.data) return;
+    // Only accept messages from the direct parent frame. Blocks sibling /
+    // unrelated-window postMessage senders that could otherwise reach us.
+    if (event.source !== window.parent) return;
+
+    const trustedParentOrigin = getTrustedParentOrigin(event);
+    if (!trustedParentOrigin) return;
+    trustedTopOrigin = trustedParentOrigin;
+
+    if (event.data.type === "INLINE_EDIT_SCROLL_START") {
+      scrollForwarding = true;
+      emitScroll();
+      return;
+    }
+
+    if (event.data.type === "INLINE_EDIT_SCROLL_STOP") {
+      scrollForwarding = false;
+      if (scrollRaf) cancelAnimationFrame(scrollRaf);
+      scrollRaf = 0;
+      return;
+    }
+
+    if (event.data.type !== "INLINE_EDIT_CAPTURE_REQUEST") return;
+
+    handleCaptureRequest(event);
+  });
+})();
+
+
+</script></body>
+
+</html>

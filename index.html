@@ -1,175 +1,35 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="theme-color" content="#000000" />
-  <title>PIFO — Counter Strike 2</title>
-  <meta name="description" content="PIFO — Counter Strike 2 oyuncusunun kişisel sayfası." />
-  <style>
-    :root {
-      --bg:#000;
-      --fg:#fff;
-      --muted:#9a9a9a;
-      --line:#202020;
-      --soft:#0c0c0c;
-      --soft2:#111;
-      --radius:18px;
-      --max:1080px;
-    }
-    *{box-sizing:border-box;margin:0;padding:0}
-    html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased}
-    body{background:var(--bg);color:var(--fg);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh;line-height:1.5;overflow-x:hidden}
-    a{color:inherit;text-decoration:none}
-    button{font:inherit}
-    ::selection{background:#fff;color:#000}
-    .wrap{width:min(calc(100% - 36px),var(--max));margin:0 auto}
-    .topbar{position:sticky;top:0;z-index:20;background:rgba(0,0,0,.78);backdrop-filter:blur(16px);border-bottom:1px solid var(--line)}
-    .topbar-inner{height:64px;display:flex;align-items:center;justify-content:space-between}
-    .brand{font-size:.9rem;font-weight:800;letter-spacing:.22em}
-    .nav{display:flex;gap:8px;align-items:center}
-    .nav a,.lang button{border:1px solid var(--line);background:transparent;color:var(--muted);padding:8px 11px;border-radius:999px;font-size:.78rem;cursor:pointer;transition:.2s ease}
-    .nav a:hover,.lang button:hover,.lang button.active{color:#000;background:#fff;border-color:#fff}
-    .lang{display:flex;gap:6px;margin-left:4px}
-    .hero{min-height:72vh;display:grid;align-items:end;padding:96px 0 70px;border-bottom:1px solid var(--line)}
-    .kicker{font-size:.78rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:18px}
-    h1{font-size:clamp(4.8rem,14vw,10rem);line-height:.78;letter-spacing:-.075em;font-weight:900}
-    .hero-copy{margin-top:34px;max-width:700px;color:#d3d3d3;font-size:clamp(1.05rem,2vw,1.35rem)}
-    .hero-copy strong{color:#fff;font-weight:650}
-    .meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}
-    .pill{display:inline-flex;align-items:center;gap:9px;border:1px solid var(--line);border-radius:999px;padding:10px 14px;color:#c9c9c9;font-size:.86rem;transition:.2s ease}
-    .pill:hover{background:#fff;color:#000;border-color:#fff}
-    .section{padding:72px 0;border-bottom:1px solid var(--line)}
-    .section-head{display:grid;grid-template-columns:90px 1fr;gap:24px;margin-bottom:28px}
-    .num{color:#5d5d5d;font-size:.8rem;letter-spacing:.14em}
-    h2{font-size:clamp(1.8rem,4vw,3rem);letter-spacing:-.04em}
-    .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-    .card{position:relative;display:flex;align-items:flex-end;justify-content:space-between;min-height:150px;padding:24px;border:1px solid var(--line);border-radius:var(--radius);background:var(--soft);transition:.22s ease;overflow:hidden}
-    .card:hover{background:#fff;color:#000;border-color:#fff;transform:translateY(-2px)}
-    .card:hover .card-sub{color:#444}
-    .card-title{font-size:1.25rem;font-weight:750;letter-spacing:-.02em}
-    .card-sub{color:var(--muted);font-size:.84rem;margin-top:5px;transition:.2s}
-    .arrow{font-size:1.4rem}
-    .footer{padding:34px 0 48px;display:flex;justify-content:space-between;gap:20px;color:#696969;font-size:.78rem}
-    .overlay-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);opacity:0;pointer-events:none;transition:.2s;z-index:50}
-    .overlay-backdrop.open{opacity:1;pointer-events:auto}
-    .overlay{position:fixed;inset:24px;z-index:60;border:1px solid #2a2a2a;background:#050505;border-radius:20px;overflow:hidden;opacity:0;transform:scale(.985);pointer-events:none;transition:.22s ease}
-    .overlay.open{opacity:1;transform:scale(1);pointer-events:auto}
-    .overlay iframe{width:100%;height:100%;border:0;background:#000}
-    .close{position:absolute;right:14px;top:14px;width:40px;height:40px;border-radius:50%;border:1px solid #333;background:#000;color:#fff;cursor:pointer;z-index:2}
-    .reaction{display:none;height:100%;padding:72px 28px 28px;overflow:auto}
-    .reaction.show{display:block}
-    .reaction-inner{max-width:820px;margin:0 auto}
-    .reaction p{color:var(--muted);margin:8px 0 24px}
-    .reaction-area{height:320px;border:1px solid var(--line);border-radius:18px;display:grid;place-items:center;text-align:center;background:#0b0b0b;font-size:1.2rem;font-weight:700;user-select:none;cursor:pointer;padding:20px}
-    .reaction-area.wait{background:#171717}.reaction-area.ready{background:#fff;color:#000}
-    .reaction-controls{display:flex;gap:10px;align-items:center;margin-top:14px;flex-wrap:wrap}
-    .btn{border:1px solid var(--line);background:#fff;color:#000;border-radius:999px;padding:11px 16px;font-weight:700;cursor:pointer}
-    .stats{color:var(--muted);font-size:.9rem}
-    .toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,18px);background:#fff;color:#000;padding:10px 15px;border-radius:999px;font-size:.82rem;font-weight:700;opacity:0;pointer-events:none;transition:.2s;z-index:100}
-    .toast.show{opacity:1;transform:translate(-50%,0)}
-    @media(max-width:760px){
-      .topbar-inner{height:58px}.nav>a{display:none}.hero{min-height:66vh;padding:72px 0 50px}.section{padding:52px 0}.section-head{grid-template-columns:1fr;gap:8px}.grid{grid-template-columns:1fr}.card{min-height:126px}.overlay{inset:8px}.footer{flex-direction:column}.brand{font-size:.78rem}
-    }
-    @media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="theme-color" content="#050505" />
+<title>PIFO — Counter Strike 2</title>
+<link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <header class="topbar">
-    <div class="wrap topbar-inner">
-      <a class="brand" href="#top">PIFO</a>
-      <div class="nav">
-        <a href="#social" data-i18n="navSocial">Sosyal</a>
-        <a href="#content" data-i18n="navContent">İçerik</a>
-        <div class="lang">
-          <button id="trBtn">TR</button>
-          <button id="enBtn">EN</button>
-        </div>
-      </div>
-    </div>
-  </header>
+<div class="spotlight" id="spotlight"></div>
 
-  <main id="top">
-    <section class="hero">
-      <div class="wrap">
-        <div class="kicker" data-i18n="kicker">Counter Strike 2 Oyuncusu</div>
-        <h1>PIFO</h1>
-        <p class="hero-copy" data-i18n-html="heroCopy">Kendim için <strong>Counter Strike 2</strong> oynuyorum. Kim bilir, belki bir gün <strong>Eternal Fire</strong> için oynarım.</p>
-        <div class="meta">
-          <a class="pill" id="emailPill" href="mailto:official.pifo@gmail.com">official.pifo@gmail.com</a>
-          <a class="pill" href="https://x.com/PIFOcsgo" target="_blank" rel="noopener">X / @PIFOcsgo</a>
-          <a class="pill" href="https://www.youtube.com/@etlibiftek" target="_blank" rel="noopener">YouTube / @etlibiftek</a>
-        </div>
-      </div>
-    </section>
+<main id="top">
+<section class="hero"><div class="wrap hero-grid"><div><div class="eyebrow" data-i18n="kicker">Counter Strike 2 Oyuncusu</div><h1 class="hero-title"><span class="outline">PIFO</span>PIFO</h1><p class="hero-copy" data-i18n-html="heroCopy">Kendim için <strong>Counter Strike 2</strong> oynuyorum. Kim bilir, belki bir gün <strong>Eternal Fire</strong> için oynarım.</p></div><aside class="hero-side"><div class="status-card"><div class="status-row"><span>Durum</span><span class="status-live">Çevrimiçi</span></div><div class="status-row"><span>Bölge</span><span>Türkiye</span></div><div class="status-row"><span>Rol</span><span>Rifler / Entry</span></div></div><div class="quick"><a id="emailPill" href="mailto:official.pifo@gmail.com">E-posta ↗</a><a href="https://x.com/PIFOcsgo" target="_blank">X / Twitter ↗</a><a href="https://www.youtube.com/@etlibiftek" target="_blank">YouTube ↗</a><a href="https://github.com/EtliBiftek?tab=repositories" target="_blank">GitHub ↗</a></div></aside></div></section>
 
-    <section class="section" id="social">
-      <div class="wrap">
-        <div class="section-head"><span class="num">01</span><h2 data-i18n="socialTitle">Sosyal Bağlantılar</h2></div>
-        <div class="grid">
-          <a class="card" href="https://x.com/PIFOcsgo" target="_blank" rel="noopener"><div><div class="card-title">X / Twitter</div><div class="card-sub">@PIFOcsgo</div></div><span class="arrow">↗</span></a>
-          <a class="card" href="https://www.youtube.com/@etlibiftek" target="_blank" rel="noopener"><div><div class="card-title">YouTube</div><div class="card-sub">@etlibiftek</div></div><span class="arrow">↗</span></a>
-          <a class="card" href="https://www.twitch.tv/etlibiftek" target="_blank" rel="noopener"><div><div class="card-title">Twitch</div><div class="card-sub">etlibiftek</div></div><span class="arrow">↗</span></a>
-          <a class="card" href="https://github.com/EtliBiftek?tab=repositories" target="_blank" rel="noopener"><div><div class="card-title">GitHub</div><div class="card-sub">EtliBiftek</div></div><span class="arrow">↗</span></a>
-        </div>
-      </div>
-    </section>
+<section class="section" id="ataturk"><div class="wrap"><div class="section-head"><span class="section-num">1/</span><h2 class="section-title">Atatürk</h2><p class="section-note"></p></div><a class="ataturk-wrap" id="ataturkLink" href="#" aria-label="Atatürk hakkında bilgi panelini aç"><div><div class="ataturk-kicker">Mustafa Kemal Atatürk</div><h3 class="ataturk-name">Fikirleri <span>yaşamaya devam ediyor.</span></h3></div><div class="ataturk-copy"><strong>1881 — 1938</strong><br><br>Türkiye Cumhuriyeti'nin kurucusu Mustafa Kemal Atatürk'e saygıyla. Akıl, bilim, eğitim ve bağımsızlık üzerine bıraktığı miras gelecek nesillere yol göstermeye devam ediyor.<div class="ataturk-mark">Daha fazla bilgi için tıkla</div></div></a></div></section>
 
-    <section class="section" id="content">
-      <div class="wrap">
-        <div class="section-head"><span class="num">02</span><h2 data-i18n="contentTitle">Özel İçerik</h2></div>
-        <div class="grid">
-          <a class="card embed" href="#" data-src="CounterStrike Settings/index.html"><div><div class="card-title" data-i18n="csSettings">Counter Strike 2 Ayarları</div><div class="card-sub" data-i18n="openHere">Sayfa içinde aç</div></div><span class="arrow">→</span></a>
-          <a class="card embed" href="#" data-src="MyPc/index.html"><div><div class="card-title" data-i18n="myPc">Bilgisayar Parçalarım</div><div class="card-sub" data-i18n="openHere">Sayfa içinde aç</div></div><span class="arrow">→</span></a>
-          <a class="card" id="reactionLink" href="#"><div><div class="card-title">Reaction Test</div><div class="card-sub" data-i18n="reactionSub">5 tur refleks testi</div></div><span class="arrow">→</span></a>
-        </div>
-      </div>
-    </section>
-
-    <footer class="wrap footer"><span>© 2026 PIFO</span><span>etlibiftek.github.io</span></footer>
-  </main>
-
-  <div class="overlay-backdrop" id="backdrop"></div>
-  <div class="overlay" id="overlay" aria-hidden="true">
-    <button class="close" id="closeBtn" aria-label="Close">✕</button>
-    <iframe id="frame" title="Content"></iframe>
-    <section class="reaction" id="reactionPanel">
-      <div class="reaction-inner">
-        <h2>Reaction Test</h2>
-        <p data-i18n="reactionHelp">Başlat'a bas. Alan beyaz olduğunda olabildiğince hızlı tıkla.</p>
-        <div class="reaction-area" id="reactionArea">Hazır olduğunda başlat.</div>
-        <div class="reaction-controls">
-          <button class="btn" id="reactionStart" data-i18n="start">Başlat</button>
-          <span class="stats" id="reactionStats">0 / 5 · —</span>
-        </div>
-      </div>
-    </section>
-  </div>
-  <div class="toast" id="toast">Kopyalandı</div>
-
-  <script>
-    const translations={
-      tr:{navSocial:'Sosyal',navContent:'İçerik',kicker:'Counter Strike 2 Oyuncusu',heroCopy:'Kendim için <strong>Counter Strike 2</strong> oynuyorum. Kim bilir, belki bir gün <strong>Eternal Fire</strong> için oynarım.',socialTitle:'Sosyal Bağlantılar',contentTitle:'Özel İçerik',csSettings:'Counter Strike 2 Ayarları',myPc:'Bilgisayar Parçalarım',openHere:'Sayfa içinde aç',reactionSub:'5 tur refleks testi',reactionHelp:"Başlat'a bas. Alan beyaz olduğunda olabildiğince hızlı tıkla.",start:'Başlat',copied:'Kopyalandı'},
-      en:{navSocial:'Social',navContent:'Content',kicker:'Counter Strike 2 Player',heroCopy:'I play <strong>Counter Strike 2</strong> for myself. Who knows, maybe one day I will play for <strong>Eternal Fire</strong>.',socialTitle:'Social Links',contentTitle:'Special Content',csSettings:'Counter Strike 2 Settings',myPc:'My Computer Parts',openHere:'Open inline',reactionSub:'5-round reflex test',reactionHelp:'Press start. Click as fast as possible when the area turns white.',start:'Start',copied:'Copied'}
-    };
-    let lang=(navigator.language||'en').toLowerCase().startsWith('tr')?'tr':'en';
-    const trBtn=document.getElementById('trBtn'),enBtn=document.getElementById('enBtn');
-    function setLang(l){lang=l;document.documentElement.lang=l;document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.dataset.i18n;if(translations[l][k])el.textContent=translations[l][k]});document.querySelectorAll('[data-i18n-html]').forEach(el=>{const k=el.dataset.i18nHtml;if(translations[l][k])el.innerHTML=translations[l][k]});trBtn.classList.toggle('active',l==='tr');enBtn.classList.toggle('active',l==='en')}
-    trBtn.onclick=()=>setLang('tr');enBtn.onclick=()=>setLang('en');setLang(lang);
-
-    const overlay=document.getElementById('overlay'),backdrop=document.getElementById('backdrop'),frame=document.getElementById('frame'),panel=document.getElementById('reactionPanel');
-    function openOverlay(src){panel.classList.remove('show');frame.style.display='block';frame.src=src.replace(/ /g,'%20');overlay.classList.add('open');backdrop.classList.add('open');overlay.setAttribute('aria-hidden','false');document.body.style.overflow='hidden'}
-    function closeOverlay(){overlay.classList.remove('open');backdrop.classList.remove('open');overlay.setAttribute('aria-hidden','true');document.body.style.overflow='';setTimeout(()=>{frame.src='';panel.classList.remove('show')},220)}
-    document.querySelectorAll('.embed').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();openOverlay(a.dataset.src)}));
-    document.getElementById('closeBtn').onclick=closeOverlay;backdrop.onclick=closeOverlay;document.addEventListener('keydown',e=>{if(e.key==='Escape')closeOverlay()});
-
-    document.getElementById('reactionLink').addEventListener('click',e=>{e.preventDefault();frame.style.display='none';panel.classList.add('show');overlay.classList.add('open');backdrop.classList.add('open');document.body.style.overflow='hidden'});
-    const area=document.getElementById('reactionArea'),startBtn=document.getElementById('reactionStart'),stats=document.getElementById('reactionStats');let rounds=[],waiting=false,ready=false,timer=0,startTime=0;
-    function resetRound(){waiting=true;ready=false;area.className='reaction-area wait';area.textContent=lang==='tr'?'Bekle...':'Wait...';timer=setTimeout(()=>{waiting=false;ready=true;startTime=performance.now();area.className='reaction-area ready';area.textContent=lang==='tr'?'ŞİMDİ!':'NOW!'},1200+Math.random()*2200)}
-    startBtn.onclick=()=>{rounds=[];stats.textContent='0 / 5 · —';resetRound()};
-    area.onclick=()=>{if(waiting){clearTimeout(timer);area.className='reaction-area';area.textContent=lang==='tr'?'Çok erken. Tekrar başlat.':'Too early. Start again.';waiting=false;return}if(!ready)return;ready=false;const ms=Math.round(performance.now()-startTime);rounds.push(ms);const avg=Math.round(rounds.reduce((a,b)=>a+b,0)/rounds.length);stats.textContent=`${rounds.length} / 5 · ${avg} ms`;area.className='reaction-area';area.textContent=`${ms} ms`;if(rounds.length<5)setTimeout(resetRound,700)};
-
-    const toast=document.getElementById('toast');document.getElementById('emailPill').addEventListener('click',e=>{e.preventDefault();const email='official.pifo@gmail.com';const show=()=>{toast.textContent=translations[lang].copied;toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),1500)};if(navigator.clipboard)navigator.clipboard.writeText(email).then(show).catch(show);else show()});
-  </script>
-</body>
-</html>
+<section class="section" id="social"><div class="wrap"><div class="section-head"><span class="section-num">2/</span><h2 class="section-title">Sosyal Bağlantılar</h2><p class="section-note"></p></div><div class="social-grid">
+<a class="social-card" href="https://x.com/PIFOcsgo" target="_blank"><div class="card-top"><span class="card-index">001</span></div><div><div class="card-name">X / Twitter</div><div class="card-handle">@PIFOcsgo</div></div></a>
+<a class="social-card" href="https://www.youtube.com/@etlibiftek" target="_blank"><div class="card-top"><span class="card-index">002</span></div><div><div class="card-name">YouTube</div><div class="card-handle">@etlibiftek</div></div></a>
+<a class="social-card" href="https://www.twitch.tv/etlibiftek" target="_blank"><div class="card-top"><span class="card-index">003</span></div><div><div class="card-name">Twitch</div><div class="card-handle">etlibiftek</div></div></a>
+</div></div></section>
+<section class="section" id="content"><div class="wrap"><div class="section-head"><span class="section-num">3/</span><h2 class="section-title">Özel İçerik</h2><p class="section-note"></p></div><div class="content-grid">
+<button type="button" class="feature native-open" data-panel="cs2Panel"><span class="feature-label">CS2 / CONFIG</span><div><h3 class="feature-title">Counter Strike 2 Ayarları</h3><p class="feature-desc">Crosshair, video, sensitivity ve kullandığım diğer oyun ayarları.</p></div><div class="feature-meta"><span class="feature-label">01</span></div></button>
+<button type="button" class="feature small native-open" data-panel="pcPanel"><span class="feature-label">HARDWARE</span><div><h3 class="feature-title">Bilgisayar Parçalarım</h3><p class="feature-desc">Kullandığım sistem ve çevre birimleri.</p></div><div class="feature-meta"><span class="feature-label">02</span></div></button>
+<a class="feature full" id="reactionLink" href="#"><span class="feature-label">INTERACTIVE</span><div><h3 class="feature-title">Reaction Test</h3><p class="feature-desc">5 turluk kısa refleks testi. Ortalama süreni ölç.</p></div><div class="feature-meta"><span class="feature-label">03</span></div></a>
+</div></div></section>
+</main>
+<div class="overlay-backdrop" id="backdrop"></div><div class="overlay" id="overlay" aria-hidden="true"><button class="close" id="closeBtn">✕</button>
+<iframe id="frame" title="Content" style="display:none"></iframe>
+<div id="dynamicPanels"></div>
+<section class="reaction" id="reactionPanel"><div class="reaction-inner"><h2>Reaction Test</h2><p>Başlat'a bas. Alan beyaz olduğunda olabildiğince hızlı tıkla.</p><div class="reaction-area" id="reactionArea">Hazır olduğunda başlat.</div><div class="reaction-controls"><button class="btn" id="reactionStart">Başlat</button><span class="stats" id="reactionStats">0 / 5 · —</span></div></div></section></div><div class="toast" id="toast">Kopyalandı</div>
+<script src="panels.js"></script>
+<script src="app.js"></script>
+</body></html>

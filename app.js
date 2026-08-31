@@ -24,12 +24,13 @@ html::-webkit-scrollbar,body::-webkit-scrollbar,.overlay::-webkit-scrollbar,.nat
 `;
 document.head.appendChild(hiddenScrollbarStyle);
 
-const overlay=document.getElementById('overlay'),backdrop=document.getElementById('backdrop'),frame=document.getElementById('frame'),panel=document.getElementById('reactionPanel'),ataturkPanel=document.getElementById('ataturkPanel'),cs2Panel=document.getElementById('cs2Panel'),pcPanel=document.getElementById('pcPanel');
+const overlay=document.getElementById('overlay'),backdrop=document.getElementById('backdrop'),frame=document.getElementById('frame'),dynamicPanels=document.getElementById('dynamicPanels'),panel=document.getElementById('reactionPanel'),ataturkPanel=document.getElementById('ataturkPanel'),cs2Panel=document.getElementById('cs2Panel'),pcPanel=document.getElementById('pcPanel');
 function hidePanels(){
   panel.classList.remove('show');
   ataturkPanel.classList.remove('show');
   cs2Panel.classList.remove('show');
   pcPanel.classList.remove('show');
+  dynamicPanels.style.display='none';
   frame.style.display='none';
   frame.src='';
 }
@@ -37,6 +38,7 @@ function showNativePanel(id){
   hidePanels();
   const el=document.getElementById(id);
   if(el){
+    if(el.parentElement===dynamicPanels)dynamicPanels.style.display='block';
     el.classList.add('show');
     el.scrollTop=0;
   }
